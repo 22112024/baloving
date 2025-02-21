@@ -2840,6 +2840,7 @@
   grid-area: district;
   display: flex;
   align-items: center;
+
   margin-bottom: 15px;
   padding: 0 0 0 40px;
 }
@@ -2972,6 +2973,9 @@
   align-items: center;
   margin-bottom: 15px;
   padding: 0 0 0 40px;
+}
+
+.sidebar_id a {
   text-decoration: none;
 }
 
@@ -4398,6 +4402,18 @@
     margin: 0;
     cursor: pointer;
     transition: background-color 0.7s ease;
+  }
+}
+
+@media (max-width: 600px) {
+  .sidebar_price,
+  .paragraph_district,
+  .paragraph_type,
+  .paragraph_rooms,
+  .paragraph_published,
+  .paragraph_update,
+  .paragraph_id {
+    font-size: 17px;
   }
 }
 
