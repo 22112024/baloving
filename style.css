@@ -2781,7 +2781,7 @@
   box-shadow: 1px 1px 1px rgba(110, 141, 192, 0.2),
     -1px -1px 1px rgba(110, 141, 192, 0.2);
   transition: top 0.3s ease, bottom 0.3s ease;
-  z-index: 10000;
+  z-index: 1700;
 }
 
 .sidebar_container {
