@@ -685,3 +685,28 @@ if (informationOverlay) {
     closeInformationMenu();
   });
 }
+
+// Функция для добавления эффекта "тряски"
+function addShakeEffect(elem) {
+  elem.classList.add("shake");
+  // Удаляем класс после завершения анимации
+  setTimeout(() => {
+    elem.classList.remove("shake");
+  }, 300);
+
+  // Вызов вибрации (если поддерживается)
+  if (navigator.vibrate) {
+    navigator.vibrate(50);
+  }
+}
+
+// Применяем эффект ко всем нужным элементам:
+// Например, карточкам, кнопкам переключения языка/валюты и элементам дропдауна
+const clickableElements = document.querySelectorAll(
+  ".card, #district_input, #languageSwitcher, #currencySwitcher"
+);
+clickableElements.forEach((elem) => {
+  elem.addEventListener("click", () => {
+    addShakeEffect(elem);
+  });
+});
