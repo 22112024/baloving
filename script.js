@@ -393,8 +393,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Если экран ≤550px, добавляем обработку свайпов (touch)
     if (window.innerWidth <= 550) {
-      leftBtn.style.display = "none";
-      rightBtn.style.display = "none";
+      leftBtn.style.display = "flex";
+      rightBtn.style.display = "flex";
       let touchstartX = 0;
       let touchendX = 0;
       const threshold = 30;
@@ -581,10 +581,13 @@ document.addEventListener("DOMContentLoaded", function () {
   // === Изменение цвета иконки STAR =========
   // =============================
   document.querySelectorAll(".star_icon").forEach(function (star) {
-    star.addEventListener("click", function (e) {
+    function handleStarClick(e) {
+      e.preventDefault();
       e.stopPropagation();
       star.classList.toggle("selected");
-    });
+    }
+    star.addEventListener("click", handleStarClick);
+    star.addEventListener("touchend", handleStarClick);
   });
 
   // =============================
@@ -642,13 +645,12 @@ document.addEventListener("DOMContentLoaded", function () {
 // =============================
 // === Окно information =========
 // =============================
-
 function openInformationMenu() {
   const informationMenu = document.getElementById("informationMenu");
   const informationOverlay = document.getElementById("overlay");
   if (informationMenu && informationOverlay) {
-    informationMenu.style.display = "flex";
-    informationOverlay.style.display = "block";
+    informationMenu.classList.add("active");
+    informationOverlay.classList.add("active");
   }
 }
 
@@ -656,8 +658,8 @@ function closeInformationMenu() {
   const informationMenu = document.getElementById("informationMenu");
   const informationOverlay = document.getElementById("overlay");
   if (informationMenu && informationOverlay) {
-    informationMenu.style.display = "none";
-    informationOverlay.style.display = "none";
+    informationMenu.classList.remove("active");
+    informationOverlay.classList.remove("active");
   }
 }
 
@@ -685,28 +687,3 @@ if (informationOverlay) {
     closeInformationMenu();
   });
 }
-
-// Функция для добавления эффекта "тряски"
-function addShakeEffect(elem) {
-  elem.classList.add("shake");
-  // Удаляем класс после завершения анимации
-  setTimeout(() => {
-    elem.classList.remove("shake");
-  }, 300);
-
-  // Вызов вибрации (если поддерживается)
-  if (navigator.vibrate) {
-    navigator.vibrate(50);
-  }
-}
-
-// Применяем эффект ко всем нужным элементам:
-// Например, карточкам, кнопкам переключения языка/валюты и элементам дропдауна
-const clickableElements = document.querySelectorAll(
-  ".card, #district_input, #languageSwitcher, #currencySwitcher"
-);
-clickableElements.forEach((elem) => {
-  elem.addEventListener("click", () => {
-    addShakeEffect(elem);
-  });
-});
