@@ -343,6 +343,14 @@
     min-width: 280px;
     height: auto;
   }
+
+  .information img {
+    padding: 0;
+    margin: 0;
+    width: 25.5px;
+    height: 25.5px;
+    margin-top: 3px;
+  }
 }
 
 @media (max-width: 400px) {
@@ -2129,7 +2137,7 @@
     width: 45px;
     height: 45px;
     color: #fff;
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 50%;
     border: none;
     font-size: 30px;
