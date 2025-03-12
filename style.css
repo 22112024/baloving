@@ -2254,15 +2254,15 @@
   position: fixed;
   justify-content: center;
   align-items: center;
-  bottom: 75px;
+  bottom: 55px;
   right: 0;
   transform: translateX(-50%);
-  background-color: rgba(72, 146, 191, 1);
+  background-color: rgba(240, 240, 240, 0.7);
   color: white;
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   padding: 15px;
   font-size: 20px;
   cursor: pointer;
@@ -2272,8 +2272,16 @@
   visibility: hidden;
 }
 
+.go-top img {
+  padding-bottom: 5px;
+}
+
 .go-top:hover {
-  background-color: rgba(48, 103, 138, 1);
+  background-color: rgba(240, 240, 240, 0.8);
+}
+
+.go-top:active {
+  background-color: rgba(240, 240, 240, 0.8);
 }
 
 .go-top--show {
