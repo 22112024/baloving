@@ -127,7 +127,6 @@
   visibility: visible;
 }
 
-
 .information_text {
   font-size: 16px;
 }
@@ -575,6 +574,124 @@
   .language {
     margin-right: 10px;
   }
+}
+
+/* Выпадающие меню языка и валюты */
+
+.menu_container_language {
+  display: none;
+  position: relative;
+}
+
+.language_menu {
+  font-size: 24px;
+  cursor: pointer;
+  height: 32px;
+  width: 50px;
+  margin: 0;
+  padding: 0 0 3px 1px;
+  color: rgba(48, 103, 138, 1);
+  border-radius: 30px;
+  box-shadow: 1px 1px 1px rgba(110, 141, 192, 0.2),
+    -1px -1px 1px rgba(110, 141, 192, 0.2);
+  display: flex;
+  justify-content: center;
+  perspective: 1000px;
+  transform-origin: center;
+  transition: opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+    transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.language_menu:hover {
+  transform: scale(1.04) translateZ(1px);
+}
+
+.language_list {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  top: 40px;
+  right: 0;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: 170px;
+  height: auto;
+}
+
+.language_list > div {
+  display: block;
+  text-align: left;
+}
+
+.language_list > div:last-child {
+  margin-bottom: 0;
+}
+
+.language_menu.active .language_list {
+  display: flex;
+}
+
+.menu_container_currency {
+  display: none;
+  position: relative;
+}
+
+.currency_menu {
+  font-size: 24px;
+  cursor: pointer;
+  height: 32px;
+  width: 50px;
+  margin: 0;
+  padding: 0 0 3px 1px;
+  color: rgba(48, 103, 138, 1);
+  border-radius: 30px;
+  box-shadow: 1px 1px 1px rgba(110, 141, 192, 0.2),
+    -1px -1px 1px rgba(110, 141, 192, 0.2);
+  display: flex;
+  justify-content: center;
+  perspective: 1000px;
+  transform-origin: center;
+  transition: opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+    transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.currency_menu:hover {
+  transform: scale(1.04) translateZ(1px);
+}
+
+.currency_list {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  top: 40px;
+  right: 0;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: 170px;
+  height: auto;
+}
+
+.currency_list > div {
+  display: block;
+  text-align: left;
+}
+
+.currency_list > div:last-child {
+  margin-bottom: 0;
+}
+
+.currency_menu.active .currency_list {
+  display: flex;
 }
 
 /*MAIN*/
@@ -1702,6 +1819,7 @@
   transform-origin: center;
   backface-visibility: hidden;
   cursor: pointer;
+  pointer-events: auto;
 }
 
 .image_card {
@@ -1829,12 +1947,16 @@
   position: absolute;
   top: 25px;
   right: 25px;
-  z-index: 3;
+  z-index: 9999;
   width: 30px;
   height: 30px;
   cursor: pointer;
   fill: #ccc;
   stroke: #fff;
+  touch-action: manipulation;
+  pointer-events: auto;
+  padding: 15px;
+  margin: -15px;
 }
 
 .star_icon.selected path {
@@ -1927,7 +2049,7 @@
   img.star_icon {
     top: 25px;
     right: 25px;
-    z-index: 3;
+    z-index: 9999;
     width: 23px;
     height: 23px;
     cursor: pointer;
@@ -2052,10 +2174,9 @@
     position: absolute;
     top: 25px;
     right: 25px;
-    z-index: 3;
+    z-index: 9999;
     width: 35px;
     height: 35px;
-    cursor: pointer;
     fill: #ccc;
     stroke: #fff;
   }
@@ -2118,6 +2239,40 @@
   }
 }
 
+/*GO-TOP*/
+
+.go-top {
+  display: flex;
+  position: fixed;
+  justify-content: center;
+  align-items: center;
+  bottom: 75px;
+  right: 0;
+  transform: translateX(-50%);
+  background-color: rgba(72, 146, 191, 1);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  padding: 15px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.go-top:hover {
+  background-color: rgba(48, 103, 138, 1);
+}
+
+.go-top--show {
+  opacity: 1;
+  visibility: visible;
+}
+
 /*FOOTER*/
 
 .footer {
@@ -2144,8 +2299,14 @@
 }
 
 .footer_list li {
+  text-decoration: none;
   text-align: center;
   cursor: pointer;
+}
+
+.footer_list li a {
+  text-decoration: none;
+  color: white;
 }
 
 .footer_list li img {
