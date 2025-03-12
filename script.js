@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function openLink(url) {
     window.location.href = url;
   }
+  window.openLink = openLink;
 
   // =============================
   // === Предотвращение окна "Повторная отправка формы" =========
@@ -14,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // =========================
-  // === Переключение языка ===
+  // === Переключение языка (основной переключатель) ===
   // =========================
   const russianButton = document.getElementById("russian");
   const englishButton = document.getElementById("english");
@@ -34,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // =========================
-  // === Переключение валюты ===
+  // === Переключение валюты (основной переключатель) ===
   // =========================
   const idrButton = document.getElementById("idr");
   const usdButton = document.getElementById("usd");
@@ -50,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
     target.classList.add("active");
   }
 
-  // Обработчики для переключения языка и валюты
+  // Обработчики для переключения языка и валюты в основном переключателе
   const languageSwitcher = document.getElementById("languageSwitcher");
   if (languageSwitcher) {
     languageSwitcher.addEventListener("click", function (event) {
@@ -70,27 +71,174 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Устанавливаем начальные состояния
   if (russianButton && englishButton) {
     russianButton.classList.add("active");
     englishButton.classList.add("inactive");
   }
-
   if (idrButton && usdButton && rubButton) {
     idrButton.classList.add("active");
     usdButton.classList.add("inactive");
     rubButton.classList.add("inactive");
   }
 
+  // Функция для закрытия выпадающих меню при клике вне их области
+  function closeMenus(e) {
+    const langContainer = document.getElementById("languageContainer");
+    const currContainer = document.getElementById("currencyContainer");
+    if (
+      !e.target.closest("#languageContainer") &&
+      !e.target.closest(".language")
+    ) {
+      langContainer.style.display = "none";
+    }
+    if (
+      !e.target.closest("#currencyContainer") &&
+      !e.target.closest(".currency")
+    ) {
+      currContainer.style.display = "none";
+    }
+    // Убираем обработчик после срабатывания
+    document.removeEventListener("click", closeMenus);
+  }
+
   // ======================================
   // === Функции для работы с выпадающими меню =========
   // ======================================
+  function toggleLanguageMenu(event) {
+    event.stopPropagation(); // Останавливаем всплытие
+    if (window.innerWidth < 1150) {
+      const langContainer = document.getElementById("languageContainer");
+      const currentDisplay = window.getComputedStyle(langContainer).display;
+      console.log("Текущий display языка:", currentDisplay);
+      langContainer.style.display =
+        currentDisplay === "none" ? "block" : "none";
+      console.log("После клика display языка:", langContainer.style.display);
+      // Добавляем обработчик клика вне меню для его закрытия
+      setTimeout(() => {
+        document.addEventListener("click", closeMenus);
+      }, 0);
+    }
+  }
+  window.toggleLanguageMenu = toggleLanguageMenu;
+
+  function toggleCurrencyMenu(event) {
+    event.stopPropagation(); // Останавливаем всплытие
+    if (window.innerWidth < 1150) {
+      const currContainer = document.getElementById("currencyContainer");
+      const currentDisplay = window.getComputedStyle(currContainer).display;
+      currContainer.style.display =
+        currentDisplay === "none" ? "block" : "none";
+      // Добавляем обработчик клика вне меню для его закрытия
+      setTimeout(() => {
+        document.addEventListener("click", closeMenus);
+      }, 0);
+    }
+  }
+  window.toggleCurrencyMenu = toggleCurrencyMenu;
+
+  // Добавляем триггеры для выпадающих меню на экранах меньше 1150px
+  if (window.innerWidth < 1150) {
+    const languageElement = document.querySelector(".language");
+    if (languageElement) {
+      languageElement.addEventListener("click", function (event) {
+        event.stopPropagation();
+        toggleLanguageMenu(event);
+      });
+    }
+
+    const currencyElement = document.querySelector(".currency");
+    if (currencyElement) {
+      currencyElement.addEventListener("click", function (event) {
+        event.stopPropagation();
+        toggleCurrencyMenu(event);
+      });
+    }
+  }
+
+  // ================================
+  // === Переключение через выпадающее меню ===
+  // ================================
+  function switchLanguageFromMenu(event) {
+    event.stopPropagation();
+    const selectedLang = event.target.textContent.trim();
+    const langOptions = document.querySelectorAll(
+      "#languageContainer .language_list .language div"
+    );
+    langOptions.forEach((opt) => {
+      opt.classList.remove("active");
+      opt.classList.add("inactive");
+    });
+    event.target.classList.add("active");
+    event.target.classList.remove("inactive");
+
+    // Обновляем основной переключатель
+    if (selectedLang === "RU") {
+      russianButton.classList.add("active");
+      russianButton.classList.remove("inactive");
+      englishButton.classList.add("inactive");
+      englishButton.classList.remove("active");
+    } else if (selectedLang === "EN") {
+      englishButton.classList.add("active");
+      englishButton.classList.remove("inactive");
+      russianButton.classList.add("inactive");
+      russianButton.classList.remove("active");
+    }
+    document.getElementById("languageContainer").style.display = "none";
+  }
+  window.switchLanguageFromMenu = switchLanguageFromMenu;
+
+  function switchCurrencyFromMenu(event) {
+    event.stopPropagation();
+    const selectedCurr = event.target.textContent.trim();
+    const currOptions = document.querySelectorAll(
+      "#currencyContainer .currency_list .currency div"
+    );
+    currOptions.forEach((opt) => {
+      opt.classList.remove("active");
+      opt.classList.add("inactive");
+    });
+    event.target.classList.add("active");
+    event.target.classList.remove("inactive");
+
+    if (selectedCurr === "IDR") {
+      idrButton.classList.add("active");
+      idrButton.classList.remove("inactive");
+      usdButton.classList.add("inactive");
+      rubButton.classList.add("inactive");
+      usdButton.classList.remove("active");
+      rubButton.classList.remove("active");
+    } else if (selectedCurr === "USD") {
+      usdButton.classList.add("active");
+      usdButton.classList.remove("inactive");
+      idrButton.classList.add("inactive");
+      rubButton.classList.add("inactive");
+      idrButton.classList.remove("active");
+      rubButton.classList.remove("active");
+    } else if (selectedCurr === "RUB") {
+      rubButton.classList.add("active");
+      rubButton.classList.remove("inactive");
+      idrButton.classList.add("inactive");
+      usdButton.classList.add("inactive");
+      idrButton.classList.remove("active");
+      usdButton.classList.remove("active");
+    }
+    document.getElementById("currencyContainer").style.display = "none";
+  }
+  window.switchCurrencyFromMenu = switchCurrencyFromMenu;
+
+  // =============================
+  // === Остальной существующий код =========
+  // =============================
+  // (Здесь остальной код, связанный с фильтрами, слайдерами и т.д.)
+
+  // Функции для работы с выпадающими меню фильтров
   function toggleDropdownMenu(menuId) {
     const dropdownMenu = document.getElementById(menuId);
     if (dropdownMenu) {
       dropdownMenu.classList.toggle("active");
     }
   }
-
   function closeDropdownMenu(menuId) {
     const dropdownMenu = document.getElementById(menuId);
     if (dropdownMenu) {
@@ -98,7 +246,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Закрытие меню при клике вне его
   document.addEventListener("click", function (event) {
     const dropdownMenus = [
       "district_dropdown",
@@ -120,14 +267,11 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Предотвращаем закрытие меню при клике внутри него
   document.querySelectorAll(".dropdown_menu").forEach((menu) => {
     menu.addEventListener("click", function (event) {
       event.stopPropagation();
     });
   });
-
-  // Закрытие меню по кнопке "Сохранить"
   document.querySelectorAll(".dropdown_menu .save_button").forEach((button) => {
     button.addEventListener("click", function (event) {
       event.stopPropagation();
@@ -138,22 +282,18 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // ================================
-  // === Работа с фильтрами (UI) ===
-  // ================================
+  // Работа с фильтрами (UI)
   document.querySelectorAll(".rooms_btn").forEach((button) => {
     button.addEventListener("click", function () {
       this.classList.toggle("selected");
     });
   });
-
   document.querySelectorAll(".choose_price").forEach((button) => {
     button.addEventListener("click", function () {
       this.classList.toggle("selected");
     });
   });
 
-  // Обработчики открытия выпадающих меню для фильтров
   const districtTrigger = document.querySelector(".district");
   if (districtTrigger) {
     districtTrigger.addEventListener("click", function (event) {
@@ -161,7 +301,6 @@ document.addEventListener("DOMContentLoaded", function () {
       toggleDropdownMenu("district_dropdown");
     });
   }
-
   const typeTrigger = document.querySelector(".type");
   if (typeTrigger) {
     typeTrigger.addEventListener("click", function (event) {
@@ -169,7 +308,6 @@ document.addEventListener("DOMContentLoaded", function () {
       toggleDropdownMenu("type_dropdown");
     });
   }
-
   const roomsTrigger = document.querySelector(".rooms");
   if (roomsTrigger) {
     roomsTrigger.addEventListener("click", function (event) {
@@ -177,7 +315,6 @@ document.addEventListener("DOMContentLoaded", function () {
       toggleDropdownMenu("rooms_dropdown");
     });
   }
-
   const priceTrigger = document.querySelector(".price");
   if (priceTrigger) {
     priceTrigger.addEventListener("click", function (event) {
@@ -186,7 +323,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Ограничение количества знаков в полях ввода для rooms и price
   document
     .querySelectorAll('.rooms_menu .input_fields input[type="number"]')
     .forEach((input) => {
@@ -196,7 +332,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
     });
-
   document
     .querySelectorAll('.price_menu .input_fields input[type="number"]')
     .forEach((input) => {
@@ -207,9 +342,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 
-  // ================================================
-  // === Форматирование выбранных значений для фильтров ===
-  // ================================================
   function formatSelection(items, maxChars) {
     let result = "";
     let count = 0;
@@ -229,7 +361,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     return result;
   }
-
   function updateFilterText(inputId, items, labelText, defaultText) {
     const selectionText =
       items.length > 0 ? formatSelection(items, 14) : defaultText;
@@ -238,8 +369,6 @@ document.addEventListener("DOMContentLoaded", function () {
       inputEl.innerHTML = `${labelText}<br/><span class="sub_text">${selectionText}</span>`;
     }
   }
-
-  // Обработчики кнопок "Сохранить" для фильтров
   const districtSaveBtn = document.getElementById("district_saveButton");
   if (districtSaveBtn) {
     districtSaveBtn.addEventListener("click", function (e) {
@@ -256,7 +385,6 @@ document.addEventListener("DOMContentLoaded", function () {
       closeDropdownMenu("district_dropdown");
     });
   }
-
   const typeSaveBtn = document.getElementById("type_saveButton");
   if (typeSaveBtn) {
     typeSaveBtn.addEventListener("click", function (e) {
@@ -273,10 +401,6 @@ document.addEventListener("DOMContentLoaded", function () {
       closeDropdownMenu("type_dropdown");
     });
   }
-
-  // ============================
-  // === Обработчик кнопки "Поиск" ===
-  // ============================
   const searchButton = document.querySelector(".search_buttom");
   if (searchButton) {
     searchButton.addEventListener("click", function (e) {
@@ -330,17 +454,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // ============================
+  // =============================
   // === Слайдер для карточек на главной странице =========
-  // ============================
+  // =============================
   document.querySelectorAll(".card").forEach((card) => {
     const container = card.querySelector(".card_image_svg");
-    // Выбираем только изображения с классом slider_image
     const images = container.querySelectorAll("img.slider_image");
     const leftBtn = card.querySelector(".card_slider_btn_left");
     const rightBtn = card.querySelector(".card_slider_btn_right");
 
-    // Создаем контейнер для индикаторов (линий)
     let dotsContainer = container.querySelector(".slider_dots");
     if (!dotsContainer) {
       dotsContainer = document.createElement("div");
@@ -391,7 +513,6 @@ document.addEventListener("DOMContentLoaded", function () {
       updateDots();
     });
 
-    // Если экран ≤550px, добавляем обработку свайпов (touch)
     if (window.innerWidth <= 550) {
       leftBtn.style.display = "flex";
       rightBtn.style.display = "flex";
@@ -430,9 +551,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // ============================
+  // =============================
   // === Слайдер (галерея на странице описания) =================
-  // ============================
+  // =============================
   const sliderEl = document.querySelector(".slider");
   const sliderContainer = document.querySelector(".slider_container");
   const sliderBtnLeft = document.querySelector(".slider_btn_left");
@@ -512,6 +633,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // =============================
   // === Мобильный слайдер для главного фото (при ≤800px) ============
+  // =============================
   if (window.innerWidth <= 800) {
     const mainPhotoImg = document.querySelector(".main_photo img");
     const mainPhotoContainer = document.querySelector(".main_photo");
@@ -563,7 +685,6 @@ document.addEventListener("DOMContentLoaded", function () {
         updateMobileDots();
       });
     }
-
     if (mobileRightBtn) {
       mobileRightBtn.addEventListener("click", function (e) {
         e.preventDefault();
@@ -582,12 +703,21 @@ document.addEventListener("DOMContentLoaded", function () {
   // =============================
   document.querySelectorAll(".star_icon").forEach(function (star) {
     function handleStarClick(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      star.classList.toggle("selected");
+      e.preventDefault(); // Предотвращаем стандартное поведение
+      e.stopPropagation(); // Останавливаем распространение события
+      star.classList.toggle("selected"); // Переключаем класс
     }
+
+    // Обработка клика мышью
     star.addEventListener("click", handleStarClick);
+
+    // Обработка касания на мобильных устройствах
     star.addEventListener("touchend", handleStarClick);
+
+    // Предотвращаем запуск события touchend на родительском элементе
+    star.addEventListener("touchstart", function (e) {
+      e.stopPropagation(); // Останавливаем распространение на touchstart
+    });
   });
 
   // =============================
@@ -601,19 +731,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if (complaintMenu) complaintMenu.classList.add("active");
     if (complaintOverlay) complaintOverlay.classList.add("active");
   }
-
   function closeComplaintMenu() {
     if (complaintMenu) complaintMenu.classList.remove("active");
     if (complaintOverlay) complaintOverlay.classList.remove("active");
   }
-
   if (complaintLink) {
     complaintLink.addEventListener("click", function (e) {
       e.preventDefault();
       openComplaintMenu();
     });
   }
-
   const closeComplaintButton = document.querySelector(
     ".close_complaint_button"
   );
@@ -623,7 +750,6 @@ document.addEventListener("DOMContentLoaded", function () {
       closeComplaintMenu();
     });
   }
-
   document.addEventListener("click", function (e) {
     if (
       complaintMenu &&
@@ -634,7 +760,6 @@ document.addEventListener("DOMContentLoaded", function () {
       closeComplaintMenu();
     }
   });
-
   if (complaintMenu) {
     complaintMenu.addEventListener("click", function (e) {
       e.stopPropagation();
@@ -642,9 +767,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-// =============================
+// ================
 // === Окно information =========
-// =============================
 function openInformationMenu() {
   const informationMenu = document.getElementById("informationMenu");
   const informationOverlay = document.getElementById("overlay");
@@ -653,6 +777,7 @@ function openInformationMenu() {
     informationOverlay.classList.add("active");
   }
 }
+window.openInformationMenu = openInformationMenu;
 
 function closeInformationMenu() {
   const informationMenu = document.getElementById("informationMenu");
@@ -662,6 +787,7 @@ function closeInformationMenu() {
     informationOverlay.classList.remove("active");
   }
 }
+window.closeInformationMenu = closeInformationMenu;
 
 const informationButton = document.getElementById("informationButton");
 if (informationButton) {
@@ -670,7 +796,6 @@ if (informationButton) {
     openInformationMenu();
   });
 }
-
 const closeInformationButton = document.getElementById(
   "closeInformationButton"
 );
@@ -680,10 +805,45 @@ if (closeInformationButton) {
     closeInformationMenu();
   });
 }
-
 const informationOverlay = document.getElementById("overlay");
 if (informationOverlay) {
   informationOverlay.addEventListener("click", function (e) {
     closeInformationMenu();
   });
+}
+
+// =============================
+// === ПРОКРУТКА ВВЕРХ GO-TOP =========
+// =============================
+
+const goTopBtn = document.querySelector(".go-top");
+
+// ПРОКРУТКА КНОПКИ
+window.addEventListener("scroll", trackScroll);
+
+// Добавляем обработчик клика на кнопку
+goTopBtn.addEventListener("click", goTop);
+
+// Функция для отслеживания прокрутки
+function trackScroll() {
+  const scrolled = window.scrollY; // Получаем текущую прокрутку
+  const coords = document.documentElement.clientHeight; // Высота видимой области окна
+
+  // Если прокрутили вниз больше, чем на высоту окна
+  if (scrolled > coords) {
+    goTopBtn.classList.add("go-top--show"); // Показываем кнопку
+  } else {
+    goTopBtn.classList.remove("go-top--show"); // Скрываем кнопку
+  }
+}
+
+// Функция для плавной прокрутки вверх
+function goTop() {
+  if (window.scrollY > 0) {
+    // Используем requestAnimationFrame для плавной прокрутки
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth", // Плавная прокрутка
+    });
+  }
 }
