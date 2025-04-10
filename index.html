@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
   <head>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="main.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
     <title>Baliarenda</title>
   </head>
   <body class="body">
@@ -19,47 +19,47 @@
           <div class="information" id="informationButton">
             <a href="#"><img src="img/information.svg" alt="Information" /></a>
           </div>
-          <div class="nav_menu">
-            <div class="language_currency" id="languageSwitcher">
-              <div class="language_switcher">
-                <div class="language">
-                  <div class="russian" id="russian">RU</div>
-                  <div class="english" id="english">EN</div>
-                </div>
-              </div>
-              <div class="currency_switcher">
-                <div class="currency">
-                  <div class="usd" id="usd">USD</div>
-                  <div class="idr" id="idr">IDR</div>
-                  <div class="rub" id="rub">RUB</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
+  
           <div class="overlay" id="overlay"></div>
           <div class="information_menu" id="informationMenu">
-            <div class="close_button" onclick="closeInformationMenu()"><img src="img/close_button.svg" alt="Close button"></div>
+            <div class="close_button" onclick="closeInformationMenu()">
+              <img src="img/close_button.svg" alt="Close button" />
+            </div>
             <form class="information_form" method="post">
               <div class="information_text">
                 <p>Baliarenda - бесплатная платформа поиска жилья на Бали.</p>
-                <p>На платформе размещаются в реальном времени объявления об аренде вилл, домов, гестхаусов, отелей, квартир и комнат.</p>
+                <p>
+                  На платформе размещаются в реальном времени объявления об аренде
+                  вилл, домов, гестхаусов, отелей, апартаментов и комнат.
+                </p>
                 <p>Публикуются только актуальные предложения без дублей и спама.</p>
-                <p>Сервис абсолютно бесплатен. Мы предоставляем прямые контакты без посредников.</p>
-              </div>              
+                <p>
+                  Сервис абсолютно бесплатен. Мы предоставляем прямые контакты без
+                  посредников.
+                </p>
+              </div>
               <div class="link_telegram_channel">
                 <span>t.me/baliarenda_group</span>
-                <button class="form_button" type="button" onclick="openLink('https://t.me/baliarenda_group')">
-                  <img src="img/send.svg" alt="Send">
-                </button></div>
+                <button
+                  class="form_button"
+                  type="button"
+                  onclick="openLink('https://t.me/baliarenda_group')"
+                >
+                  <img src="img/send.svg" alt="Send" />
+                </button>
+              </div>
               <div class="link_telegram_bot">
                 <span>t.me/baliarenda</span>
-                <button class="form_button" type="button" onclick="openLink('https://t.me/baliarenda')">
-                  <img src="img/send.svg" alt="Send">
-                </button></div>
+                <button
+                  class="form_button"
+                  type="button"
+                  onclick="openLink('https://t.me/baliarenda')"
+                >
+                  <img src="img/send.svg" alt="Send" />
+                </button>
+              </div>
             </form>
           </div>
-                  
         </div>
       </header>
       
@@ -68,9 +68,15 @@
         <div class="search_section">
           <ul class="search_filters">
             <li class="district">
+                <img
+                src="img/district.svg"
+                alt="District icon"
+                class="search_icon district_icon"
+              />
               <a id="district_input" href="#">
                 Район <br /><span class="sub_text">один или несколько</span>
               </a>
+              <img src="img/searcharrow.svg" alt="Arrow" class="arrow_bottom" />
               <div class="dropdown_menu district_dropdown_menu" id="district_dropdown">
                 <ul class="li_checkbox">
                   <li><input type="checkbox" id="canggu" /><label for="canggu">Чангу</label></li>
@@ -99,9 +105,29 @@
                 <button id="district_saveButton" class="save_button">Сохранить</button>
               </div>
             </li>
+
+            <div class="separator_line"></div>
+            <li class="type">
+              <img src="img/house.svg" alt="Home icon" class="search_icon home_icon" />
+              <a id="type_input" href="#">Тип жилья <br /><span class="sub_text">один или несколько</span></a>
+              <img src="img/searcharrow.svg" alt="Arrow" class="arrow_bottom" />
+              <div class="dropdown_menu type_dropdown_menu" id="type_dropdown">
+                <ul class="li_checkbox">
+                  <li><input type="checkbox" id="villa" /><label for="villa">Вилла</label></li>
+                  <li><input type="checkbox" id="house" /><label for="house">Дом</label></li>
+                  <li><input type="checkbox" id="apartment" /><label for="apartment">Апартаменты</label></li>
+                  <li><input type="checkbox" id="room" /><label for="room">Комната</label></li>
+                  <li><input type="checkbox" id="townhouse" /><label for="townhouse">Таунхаус</label></li>
+                  <li><input type="checkbox" id="hotel" /><label for="hotel">Отель</label></li>
+                </ul>
+                <button id="type_saveButton" class="save_button">Сохранить</button>
+              </div>
+            </li>
+            
             <div class="separator_line"></div>
             <li class="rooms">
-              <a id="rooms_input" href="#">Комнаты </br>
+                <img src="img/rooms.svg" alt="Home icon" class="search_icon home_icon" />
+                <a id="rooms_input" href="#">Комнаты </br>
                 <div class="rooms_menu" id="rooms_menu">
                   <ul class="li_checkbox">
                     <li class="input_fields">
@@ -117,40 +143,73 @@
                 </div>
               </a>
             </li>
+
             <div class="separator_line"></div>
-            <li class="type">
-              <a id="type_input" href="#">Тип жилья <br /><span class="sub_text">один или несколько</span>
-              </a>
-              <div class="dropdown_menu type_dropdown_menu" id="type_dropdown">
+            <li class="term">
+              <img src="img/calendar.svg" alt="Term icon" class="search_icon term_icon" />
+              <a id="term_input" href="#">Период <br /><span class="sub_text">один или несколько</span></a>
+              <img src="img/searcharrow.svg" alt="Arrow" class="arrow_bottom" />
+              <div class="dropdown_menu term_dropdown_menu" id="term_dropdown">
                 <ul class="li_checkbox">
-                  <li><input type="checkbox" id="villa" /><label for="villa">Вилла</label></li>
-                  <li><input type="checkbox" id="house" /><label for="house">Дом</label></li>
-                  <li><input type="checkbox" id="apartment" /><label for="apartment">Апартаменты</label></li>
-                  <li><input type="checkbox" id="room" /><label for="room">Комната</label></li>
-                  <li><input type="checkbox" id="townhouse" /><label for="townhouse">Таунхаус</label></li>
-                  <li><input type="checkbox" id="hotel" /><label for="hotel">Отель</label></li>
+                  <li><input type="checkbox" id="daily" /><label for="daily">Посуточно</label></li>
+                  <li><input type="checkbox" id="monthly" /><label for="monthly">Месяц</label></li>
+                  <li><input type="checkbox" id="weekly" /><label for="weekly">Неделя</label></li>
+                  <li><input type="checkbox" id="yearly" /><label for="yearly">Год</label></li>
                 </ul>
-                <button id="type_saveButton" class="save_button">Сохранить</button>
+                <button id="term_saveButton" class="save_button">Сохранить</button>
               </div>
             </li>
+
             <div class="separator_line"></div>
             <li class="price">
-              <a id="price_input" href="#">Цена </br>
-                <div class="price_menu" id="price_menu">
-                  <ul class="li_checkbox">
-                    <li class="input_fields">
-                      <input type="number" id="price_from" data-max-digits="3" name="price" required/>
-                      <label for="price">от</label>
-                    </li>
-                    <li>-</li>
-                    <li class="input_fields">
-                      <input type="number" id="price_to" data-max-digits="3" name="price" required/>
-                      <label for="price">до</label>
-                    </li>
-                    <li>млн.</li>
+              <img src="img/price.svg" alt="Price icon" class="search_icon price_icon" />
+              <a id="price_input" href="#">Цена <br /><span class="sub_text">мультивыбор</span></a>
+              <img src="img/searcharrow.svg" alt="Arrow" class="arrow_bottom" />
+              <div class="dropdown_menu price_dropdown_menu" id="price_dropdown">
+                <ul class="li_checkbox">
+                  <li class="input_fields">
+                    <input type="number" id="price_from" data-max-digits="3" name="price" required/>
+                    <label for="price">от</label>
+                  </li>
+                  <li class="input_fields">
+                    <input type="number" id="price_to" data-max-digits="3" name="price" required/>
+                    <label for="price">до</label>
+                  </li>
+                  <ul class="choose_fields">
+                    <li><button type="button" class="choose_price" data-price="per_day" value="в день">цена за день</button></li>
+                    <li><button type="button" class="choose_price" data-price="per_week" value="в нед">цена за неделю</button></li>
+                    <li><button type="button" class="choose_price" data-price="per_month" value="в мес">цена за месяц</button></li>
+                    <li><button type="button" class="choose_price" data-price="per_year" value="в год">цена за год</button></li>
                   </ul>
-                </div>
-              </a>
+                </ul>
+                <button id="price_saveButton" class="save_button">Сохранить</button>
+              </div>
+            </li>
+
+            <div class="separator_line"></div>
+            <li class="filter">
+              <a id="filter_input" href="#"><img src="img/filter.svg" alt="Filter icon" class="filter_icon" /></a>
+              <img src="img/mobile_filter.svg" alt="Mobile Filter icon" class="search_icon filter_mobile_icon" />
+              <a id="filter_input_mobile" href="#"><span class="filter-text">Фильтр</span><span class="sub_text">мультивыбор</span></a>
+              <img src="img/searcharrow.svg" alt="Arrow" class="arrow_filter" />
+              <div class="dropdown_menu filter_dropdown_menu" id="filter_dropdown">
+                <ul class="li_checkbox">
+                  <li><input type="checkbox" id="sea" /><label for="sea">Вид моря</label></li>
+                  <li><input type="checkbox" id="jungle" /><label for="jungle">Вид джунглей</label></li>
+                  <li><input type="checkbox" id="pool" /><label for="pool">Бассейн</label></li>
+                  <li><input type="checkbox" id="territory" /><label for="territory">Территория</label></li>
+                  <li><input type="checkbox" id="cleaning" /><label for="cleaning">Уборка</label></li>
+                  <li><input type="checkbox" id="parking" /><label for="parking">Парковка</label></li>
+                  <li><input type="checkbox" id="kitchen" /><label for="kitchen">Закрытая кухня</label></li>
+                  <li><input type="checkbox" id="caraccess" /><label for="caraccess">Подъезд для авто</label></li>
+                  <li><input type="checkbox" id="airconditioning" /><label for="airconditioning">Кондиционер</label></li>
+                  <li><input type="checkbox" id="internet" /><label for="hotel">Интернет</label></li>
+                  <li><input type="checkbox" id="samrttv" /><label for="samrttv">Smart TV</label></li>
+                  <li><input type="checkbox" id="netflix" /><label for="netflix">Netflix</label></li>
+                  <li><input type="checkbox" id="washingmachine" /><label for="washingmachine">Стиральная машина</label></li>
+                </ul>
+                <button id="filter_saveButton" class="save_button">Сохранить</button>
+              </div>
             </li>
           </ul>
           <div class="search_buttom">
@@ -162,13 +221,13 @@
         </div>
         
         <div class="card_section">
-          <div class="card" onclick="window.location.href='discription.html';">
+          <div class="card" onclick="window.location.href='discriptionnew.html';">
             <div class="image_card">
               <div class="card_image_svg" >
-                <img src="img/about_image10.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image11.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image4.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image5.jpg" alt="Photo" class="slider_image"/>
+                <img src="img/about_image10.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image11.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image4.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image5.jpg.lnk" alt="Photo" class="slider_image"/>
                 <button class="card_slider_btn card_slider_btn_left">
                   <i class="fas fa-chevron-left"><img src="img/main_slider_btn_left.svg" alt="Sider button"></i>
                 </button>
@@ -195,9 +254,9 @@
           <div class="card" onclick="window.location.href='discription.html';">
             <div class="image_card">
               <div class="card_image_svg" >
-                <img src="img/about_image8.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image4.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image5.jpg" alt="Photo" class="slider_image"/>
+                <img src="img/about_image8.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image4.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image5.jpg.lnk" alt="Photo" class="slider_image"/>
                 <button class="card_slider_btn card_slider_btn_left">
                   <i class="fas fa-chevron-left"><img src="img/main_slider_btn_left.svg" alt="Sider button"></i>
                 </button>
@@ -221,12 +280,12 @@
             </div>
           </div>
           
-          <div class="card" onclick="window.location.href='discription.html';">
+          <div class="card" onclick="window.location.href='discriptionnew.html';">
             <div class="image_card">
               <div class="card_image_svg" >
-                <img src="img/about_image3.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image4.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image5.jpg" alt="Photo" class="slider_image"/>
+                <img src="img/about_image3.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image4.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image5.jpg.lnk" alt="Photo" class="slider_image"/>
                 <button class="card_slider_btn card_slider_btn_left">
                   <i class="fas fa-chevron-left"><img src="img/main_slider_btn_left.svg" alt="Sider button"></i>
                 </button>
@@ -253,8 +312,8 @@
           <div class="card" onclick="window.location.href='discription.html';">
             <div class="image_card">
               <div class="card_image_svg" >
-                <img src="img/about_image4.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image5.jpg" alt="Photo" class="slider_image"/>
+                <img src="img/about_image4.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image5.jpg.lnk" alt="Photo" class="slider_image"/>
                 <button class="card_slider_btn card_slider_btn_left">
                   <i class="fas fa-chevron-left"><img src="img/main_slider_btn_left.svg" alt="Sider button"></i>
                 </button>
@@ -281,8 +340,8 @@
           <div class="card" onclick="window.location.href='discription.html';">
             <div class="image_card">
               <div class="card_image_svg" >
-                <img src="img/about_image5.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image4.jpg" alt="Photo" class="slider_image"/>
+                <img src="img/about_image5.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image4.jpg.lnk" alt="Photo" class="slider_image"/>
                 <button class="card_slider_btn card_slider_btn_left">
                   <i class="fas fa-chevron-left"><img src="img/main_slider_btn_left.svg" alt="Sider button"></i>
                 </button>
@@ -309,9 +368,9 @@
           <div class="card" onclick="window.location.href='discription.html';">
             <div class="image_card">
               <div class="card_image_svg" >
-                <img src="img/about_image7.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image4.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image5.jpg" alt="Photo" class="slider_image"/>                <button class="card_slider_btn card_slider_btn_left">
+                <img src="img/about_image7.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image4.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image5.jpg.lnk" alt="Photo" class="slider_image"/>                <button class="card_slider_btn card_slider_btn_left">
                   <i class="fas fa-chevron-left"><img src="img/main_slider_btn_left.svg" alt="Sider button"></i>
                 </button>
                 <button class="card_slider_btn card_slider_btn_right" >
@@ -337,9 +396,9 @@
           <div class="card" onclick="window.location.href='discription.html';">
             <div class="image_card">
               <div class="card_image_svg" >
-                <img src="img/about_image8.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image4.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image5.jpg" alt="Photo" class="slider_image"/>                <button class="card_slider_btn card_slider_btn_left">
+                <img src="img/about_image8.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image4.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image5.jpg.lnk" alt="Photo" class="slider_image"/>                <button class="card_slider_btn card_slider_btn_left">
                   <i class="fas fa-chevron-left"><img src="img/main_slider_btn_left.svg" alt="Sider button"></i>
                 </button>
                 <button class="card_slider_btn card_slider_btn_right" >
@@ -365,9 +424,9 @@
           <div class="card" onclick="window.location.href='discription.html';">
             <div class="image_card">
               <div class="card_image_svg" >
-                <img src="img/about_image9.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image4.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image5.jpg" alt="Photo" class="slider_image"/>                <button class="card_slider_btn card_slider_btn_left">
+                <img src="img/about_image9.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image4.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image5.jpg.lnk" alt="Photo" class="slider_image"/>                <button class="card_slider_btn card_slider_btn_left">
                   <i class="fas fa-chevron-left"><img src="img/main_slider_btn_left.svg" alt="Sider button"></i>
                 </button>
                 <button class="card_slider_btn card_slider_btn_right" >
@@ -393,9 +452,9 @@
           <div class="card" onclick="window.location.href='discription.html';">
             <div class="image_card">
               <div class="card_image_svg" >
-                <img src="img/about_image11.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image4.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image5.jpg" alt="Photo" class="slider_image"/>                <button class="card_slider_btn card_slider_btn_left">
+                <img src="img/about_image11.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image4.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image5.jpg.lnk" alt="Photo" class="slider_image"/>                <button class="card_slider_btn card_slider_btn_left">
                   <i class="fas fa-chevron-left"><img src="img/main_slider_btn_left.svg" alt="Sider button"></i>
                 </button>
                 <button class="card_slider_btn card_slider_btn_right" >
@@ -421,9 +480,10 @@
           <div class="card" onclick="window.location.href='discription.html';">
             <div class="image_card">
               <div class="card_image_svg" >
-                <img src="img/about_image10.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image4.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image5.jpg" alt="Photo" class="slider_image"/>                <button class="card_slider_btn card_slider_btn_left">
+                <img src="img/about_image10.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image4.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image5.jpg.lnk" alt="Photo" class="slider_image"/>
+                <button class="card_slider_btn card_slider_btn_left">
                   <i class="fas fa-chevron-left"><img src="img/main_slider_btn_left.svg" alt="Sider button"></i>
                 </button>
                 <button class="card_slider_btn card_slider_btn_right" >
@@ -449,9 +509,9 @@
           <div class="card" onclick="window.location.href='discription.html';">
             <div class="image_card">
               <div class="card_image_svg" >
-                <img src="img/about_image3.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image4.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image5.jpg" alt="Photo" class="slider_image"/>                <button class="card_slider_btn card_slider_btn_left">
+                <img src="img/about_image3.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image4.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image5.jpg.lnk" alt="Photo" class="slider_image"/>                <button class="card_slider_btn card_slider_btn_left">
                   <i class="fas fa-chevron-left"><img src="img/main_slider_btn_left.svg" alt="Sider button"></i>
                 </button>
                 <button class="card_slider_btn card_slider_btn_right" >
@@ -477,8 +537,8 @@
           <div class="card" onclick="window.location.href='discription.html';">
             <div class="image_card">
               <div class="card_image_svg" >
-                <img src="img/about_image4.jpg" alt="Photo" class="slider_image"/>
-                <img src="img/about_image5.jpg" alt="Photo" class="slider_image"/>                <button class="card_slider_btn card_slider_btn_left">
+                <img src="img/about_image4.jpg.lnk" alt="Photo" class="slider_image"/>
+                <img src="img/about_image5.jpg.lnk" alt="Photo" class="slider_image"/>                <button class="card_slider_btn card_slider_btn_left">
                   <i class="fas fa-chevron-left"><img src="img/main_slider_btn_left.svg" alt="Sider button"></i>
                 </button>
                 <button class="card_slider_btn card_slider_btn_right" >
@@ -500,13 +560,13 @@
               </ul>
             </div>
           </div>
-
+          
         </div>
       </main>
 
       <button class="go-top"><img src="img/go-top.svg" alt=""></button>
 
-      
+
       <footer class="footer">
         <ul class="footer_list">
           <li>
@@ -514,14 +574,14 @@
             <span class="footerd_baliarenda_right"> – All rights reserved</span>
           <li>  
           <li>
-            <img
+            <a href="https://t.me/baliarenda_group"><img
               src="img/telegram.svg"
-              alt="Support"
+              alt="Telegram channel"
               class="footer_channel"
-            />Телеграм канал
+            />Телеграм канал</a>
           </li>
           <li>
-            <img src="img/telegram.svg" alt="Terms and conditions" class="footer_bot" />Телеграм бот
+            <a href="https://t.me/baliarenda"><img src="img/telegram.svg" alt="Telegram bot" class="footer_bot" />Телеграм бот</a>
           </li>
         </ul>
       </footer>
