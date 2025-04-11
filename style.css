@@ -846,7 +846,7 @@
   display: block;
 }
 
-.filter-text {
+.filter_text {
   display: none;
 }
 
@@ -1571,7 +1571,7 @@
     display: none;
   }
 
-  .filter-text {
+  .filter_text {
     display: block;
   }
 
