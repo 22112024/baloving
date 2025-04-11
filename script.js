@@ -1,24 +1,82 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // =============================
-  // === Переход по ссылкам =========
-  // =============================
-  function openLink(url) {
-    window.location.href = url;
-  }
-  window.openLink = openLink;
+  console.log("DOM fully loaded");
 
-  // =============================
-  // === Предотвращение окна "Повторная отправка формы" =========
-  // =============================
-  if (window.history.replaceState) {
-    window.history.replaceState(null, null, window.location.href);
+  // Проверка флага searchClicked для восстановления или сброса данных
+  const searchClicked = localStorage.getItem("searchClicked");
+  if (searchClicked === "true") {
+    localStorage.removeItem("searchClicked");
+    restoreFromLocalStorage();
+    const selectedDistrictsNames = Array.from(
+      document.querySelectorAll(".district input[type='checkbox']:checked")
+    ).map((checkbox) => checkbox.nextElementSibling.textContent.trim());
+    updateFilterText(
+      "district_input",
+      selectedDistrictsNames,
+      "Район",
+      "мультивыбор"
+    );
+    const selectedTypesNames = Array.from(
+      document.querySelectorAll(".type input[type='checkbox']:checked")
+    ).map((checkbox) => checkbox.nextElementSibling.textContent.trim());
+    updateFilterText(
+      "type_input",
+      selectedTypesNames,
+      "Тип жилья",
+      "мультивыбор"
+    );
+    const selectedTermsNames = Array.from(
+      document.querySelectorAll(".term input[type='checkbox']:checked")
+    ).map((checkbox) => checkbox.nextElementSibling.textContent.trim());
+    updateFilterText("term_input", selectedTermsNames, "Срок", "мультивыбор");
+    const selectedFiltersNames = Array.from(
+      document.querySelectorAll(".filter input[type='checkbox']:checked")
+    ).map((checkbox) => checkbox.nextElementSibling.textContent.trim());
+    updateFilterText(
+      "filter_input_mobile",
+      selectedFiltersNames,
+      "Фильтр",
+      "мультивыбор"
+    );
+  } else {
+    localStorage.removeItem("selectedDistricts");
+    localStorage.removeItem("selectedTypes");
+    localStorage.removeItem("selectedTerms");
+    localStorage.removeItem("selectedFilters");
+    localStorage.removeItem("roomsFrom");
+    localStorage.removeItem("roomsTo");
+    localStorage.removeItem("priceFrom");
+    localStorage.removeItem("priceTo");
+    document
+      .querySelectorAll(".district input[type='checkbox']")
+      .forEach((checkbox) => (checkbox.checked = false));
+    document
+      .querySelectorAll(".type input[type='checkbox']")
+      .forEach((checkbox) => (checkbox.checked = false));
+    document
+      .querySelectorAll(".term input[type='checkbox']")
+      .forEach((checkbox) => (checkbox.checked = false));
+    document
+      .querySelectorAll(".filter input[type='checkbox']")
+      .forEach((checkbox) => (checkbox.checked = false));
+    if (document.getElementById("rooms_from"))
+      document.getElementById("rooms_from").value = "";
+    if (document.getElementById("rooms_to"))
+      document.getElementById("rooms_to").value = "";
+    if (document.getElementById("price_from"))
+      document.getElementById("price_from").value = "";
+    if (document.getElementById("price_to"))
+      document.getElementById("price_to").value = "";
+    updateFilterText("district_input", [], "Район", "мультивыбор");
+    updateFilterText("type_input", [], "Тип жилья", "мультивыбор");
+    updateFilterText("term_input", [], "Срок", "мультивыбор");
+    updateFilterText("filter_input_mobile", [], "Фильтр", "мультивыбор");
+    updateFilterText("price_input", [], "Цена", "мультивыбор");
   }
 
-  // =========================
-  // === Переключение языка (основной переключатель) ===
-  // =========================
+  // Переключение языка
   const russianButton = document.getElementById("russian");
   const englishButton = document.getElementById("english");
+  console.log("Language buttons:", russianButton, englishButton);
 
   function switchLanguage() {
     if (russianButton.classList.contains("active")) {
@@ -34,12 +92,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // =========================
-  // === Переключение валюты (основной переключатель) ===
-  // =========================
+  // Переключение валюты
   const idrButton = document.getElementById("idr");
   const usdButton = document.getElementById("usd");
   const rubButton = document.getElementById("rub");
+  console.log("Currency buttons:", idrButton, usdButton, rubButton);
 
   function switchCurrency(event) {
     const target = event.target;
@@ -51,8 +108,9 @@ document.addEventListener("DOMContentLoaded", function () {
     target.classList.add("active");
   }
 
-  // Обработчики для переключения языка и валюты в основном переключателе
+  // Обработчики для переключения языка и валюты
   const languageSwitcher = document.getElementById("languageSwitcher");
+  console.log("Language switcher:", languageSwitcher);
   if (languageSwitcher) {
     languageSwitcher.addEventListener("click", function (event) {
       if (
@@ -71,174 +129,25 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Устанавливаем начальные состояния
   if (russianButton && englishButton) {
     russianButton.classList.add("active");
     englishButton.classList.add("inactive");
   }
+
   if (idrButton && usdButton && rubButton) {
     idrButton.classList.add("active");
     usdButton.classList.add("inactive");
     rubButton.classList.add("inactive");
   }
 
-  // Функция для закрытия выпадающих меню при клике вне их области
-  function closeMenus(e) {
-    const langContainer = document.getElementById("languageContainer");
-    const currContainer = document.getElementById("currencyContainer");
-    if (
-      !e.target.closest("#languageContainer") &&
-      !e.target.closest(".language")
-    ) {
-      langContainer.style.display = "none";
-    }
-    if (
-      !e.target.closest("#currencyContainer") &&
-      !e.target.closest(".currency")
-    ) {
-      currContainer.style.display = "none";
-    }
-    // Убираем обработчик после срабатывания
-    document.removeEventListener("click", closeMenus);
-  }
-
-  // ======================================
-  // === Функции для работы с выпадающими меню =========
-  // ======================================
-  function toggleLanguageMenu(event) {
-    event.stopPropagation(); // Останавливаем всплытие
-    if (window.innerWidth < 1150) {
-      const langContainer = document.getElementById("languageContainer");
-      const currentDisplay = window.getComputedStyle(langContainer).display;
-      console.log("Текущий display языка:", currentDisplay);
-      langContainer.style.display =
-        currentDisplay === "none" ? "block" : "none";
-      console.log("После клика display языка:", langContainer.style.display);
-      // Добавляем обработчик клика вне меню для его закрытия
-      setTimeout(() => {
-        document.addEventListener("click", closeMenus);
-      }, 0);
-    }
-  }
-  window.toggleLanguageMenu = toggleLanguageMenu;
-
-  function toggleCurrencyMenu(event) {
-    event.stopPropagation(); // Останавливаем всплытие
-    if (window.innerWidth < 1150) {
-      const currContainer = document.getElementById("currencyContainer");
-      const currentDisplay = window.getComputedStyle(currContainer).display;
-      currContainer.style.display =
-        currentDisplay === "none" ? "block" : "none";
-      // Добавляем обработчик клика вне меню для его закрытия
-      setTimeout(() => {
-        document.addEventListener("click", closeMenus);
-      }, 0);
-    }
-  }
-  window.toggleCurrencyMenu = toggleCurrencyMenu;
-
-  // Добавляем триггеры для выпадающих меню на экранах меньше 1150px
-  if (window.innerWidth < 1150) {
-    const languageElement = document.querySelector(".language");
-    if (languageElement) {
-      languageElement.addEventListener("click", function (event) {
-        event.stopPropagation();
-        toggleLanguageMenu(event);
-      });
-    }
-
-    const currencyElement = document.querySelector(".currency");
-    if (currencyElement) {
-      currencyElement.addEventListener("click", function (event) {
-        event.stopPropagation();
-        toggleCurrencyMenu(event);
-      });
-    }
-  }
-
-  // ================================
-  // === Переключение через выпадающее меню ===
-  // ================================
-  function switchLanguageFromMenu(event) {
-    event.stopPropagation();
-    const selectedLang = event.target.textContent.trim();
-    const langOptions = document.querySelectorAll(
-      "#languageContainer .language_list .language div"
-    );
-    langOptions.forEach((opt) => {
-      opt.classList.remove("active");
-      opt.classList.add("inactive");
-    });
-    event.target.classList.add("active");
-    event.target.classList.remove("inactive");
-
-    // Обновляем основной переключатель
-    if (selectedLang === "RU") {
-      russianButton.classList.add("active");
-      russianButton.classList.remove("inactive");
-      englishButton.classList.add("inactive");
-      englishButton.classList.remove("active");
-    } else if (selectedLang === "EN") {
-      englishButton.classList.add("active");
-      englishButton.classList.remove("inactive");
-      russianButton.classList.add("inactive");
-      russianButton.classList.remove("active");
-    }
-    document.getElementById("languageContainer").style.display = "none";
-  }
-  window.switchLanguageFromMenu = switchLanguageFromMenu;
-
-  function switchCurrencyFromMenu(event) {
-    event.stopPropagation();
-    const selectedCurr = event.target.textContent.trim();
-    const currOptions = document.querySelectorAll(
-      "#currencyContainer .currency_list .currency div"
-    );
-    currOptions.forEach((opt) => {
-      opt.classList.remove("active");
-      opt.classList.add("inactive");
-    });
-    event.target.classList.add("active");
-    event.target.classList.remove("inactive");
-
-    if (selectedCurr === "IDR") {
-      idrButton.classList.add("active");
-      idrButton.classList.remove("inactive");
-      usdButton.classList.add("inactive");
-      rubButton.classList.add("inactive");
-      usdButton.classList.remove("active");
-      rubButton.classList.remove("active");
-    } else if (selectedCurr === "USD") {
-      usdButton.classList.add("active");
-      usdButton.classList.remove("inactive");
-      idrButton.classList.add("inactive");
-      rubButton.classList.add("inactive");
-      idrButton.classList.remove("active");
-      rubButton.classList.remove("active");
-    } else if (selectedCurr === "RUB") {
-      rubButton.classList.add("active");
-      rubButton.classList.remove("inactive");
-      idrButton.classList.add("inactive");
-      usdButton.classList.add("inactive");
-      idrButton.classList.remove("active");
-      usdButton.classList.remove("active");
-    }
-    document.getElementById("currencyContainer").style.display = "none";
-  }
-  window.switchCurrencyFromMenu = switchCurrencyFromMenu;
-
-  // =============================
-  // === Остальной существующий код =========
-  // =============================
-  // (Здесь остальной код, связанный с фильтрами, слайдерами и т.д.)
-
-  // Функции для работы с выпадающими меню фильтров
+  // Функции для работы с выпадающими меню
   function toggleDropdownMenu(menuId) {
     const dropdownMenu = document.getElementById(menuId);
     if (dropdownMenu) {
       dropdownMenu.classList.toggle("active");
     }
   }
+
   function closeDropdownMenu(menuId) {
     const dropdownMenu = document.getElementById(menuId);
     if (dropdownMenu) {
@@ -246,12 +155,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // Закрытие меню при клике вне его
   document.addEventListener("click", function (event) {
     const dropdownMenus = [
       "district_dropdown",
       "type_dropdown",
       "rooms_dropdown",
       "price_dropdown",
+      "term_dropdown",
+      "filter_dropdown",
     ];
     dropdownMenus.forEach((menuId) => {
       const dropdownMenu = document.getElementById(menuId);
@@ -267,11 +179,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  // Предотвращаем закрытие меню при клике внутри него
   document.querySelectorAll(".dropdown_menu").forEach((menu) => {
     menu.addEventListener("click", function (event) {
       event.stopPropagation();
     });
   });
+
+  // Закрытие меню по кнопке "Сохранить"
   document.querySelectorAll(".dropdown_menu .save_button").forEach((button) => {
     button.addEventListener("click", function (event) {
       event.stopPropagation();
@@ -282,47 +197,24 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Работа с фильтрами (UI)
-  document.querySelectorAll(".rooms_btn").forEach((button) => {
-    button.addEventListener("click", function () {
-      this.classList.toggle("selected");
-    });
+  // Установка "цена за месяц" активной по умолчанию
+  const priceButtons = document.querySelectorAll(".price .choose_price");
+  priceButtons.forEach((button) => {
+    if (button.getAttribute("data-price") === "per_month") {
+      button.classList.add("selected"); // Активна по умолчанию
+    }
   });
-  document.querySelectorAll(".choose_price").forEach((button) => {
-    button.addEventListener("click", function () {
-      this.classList.toggle("selected");
+
+  // Взаимоисключающий выбор кнопок .choose_price
+  document.querySelectorAll(".price .choose_price").forEach((button) => {
+    button.addEventListener("click", function (event) {
+      event.preventDefault(); // Предотвращаем действие ссылки, если есть
+      priceButtons.forEach((btn) => btn.classList.remove("selected")); // Снимаем выбор со всех
+      this.classList.add("selected"); // Выбираем только текущую кнопку
     });
   });
 
-  const districtTrigger = document.querySelector(".district");
-  if (districtTrigger) {
-    districtTrigger.addEventListener("click", function (event) {
-      event.preventDefault();
-      toggleDropdownMenu("district_dropdown");
-    });
-  }
-  const typeTrigger = document.querySelector(".type");
-  if (typeTrigger) {
-    typeTrigger.addEventListener("click", function (event) {
-      event.preventDefault();
-      toggleDropdownMenu("type_dropdown");
-    });
-  }
-  const roomsTrigger = document.querySelector(".rooms");
-  if (roomsTrigger) {
-    roomsTrigger.addEventListener("click", function (event) {
-      event.preventDefault();
-      toggleDropdownMenu("rooms_dropdown");
-    });
-  }
-  const priceTrigger = document.querySelector(".price");
-  if (priceTrigger) {
-    priceTrigger.addEventListener("click", function (event) {
-      event.preventDefault();
-      toggleDropdownMenu("price_dropdown");
-    });
-  }
-
+  // Ограничение количества знаков в полях ввода для rooms и price
   document
     .querySelectorAll('.rooms_menu .input_fields input[type="number"]')
     .forEach((input) => {
@@ -332,8 +224,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
     });
+
   document
-    .querySelectorAll('.price_menu .input_fields input[type="number"]')
+    .querySelectorAll('.price .input_fields input[type="number"]')
     .forEach((input) => {
       input.addEventListener("input", function () {
         if (this.value.length > 3) {
@@ -342,15 +235,75 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 
+  // Обработчики открытия выпадающих меню для фильтров
+  const districtTrigger = document.querySelector(".district");
+  if (districtTrigger) {
+    districtTrigger.addEventListener("click", function (event) {
+      event.preventDefault();
+      toggleDropdownMenu("district_dropdown");
+    });
+  }
+
+  const typeTrigger = document.querySelector(".type");
+  if (typeTrigger) {
+    typeTrigger.addEventListener("click", function (event) {
+      event.preventDefault();
+      toggleDropdownMenu("type_dropdown");
+    });
+  }
+
+  const roomsTrigger = document.querySelector(".rooms");
+  if (roomsTrigger) {
+    roomsTrigger.addEventListener("click", function (event) {
+      event.preventDefault();
+      toggleDropdownMenu("rooms_dropdown");
+    });
+  }
+
+  const priceTrigger = document.querySelector(".price");
+  if (priceTrigger) {
+    priceTrigger.addEventListener("click", function (event) {
+      event.preventDefault();
+      toggleDropdownMenu("price_dropdown");
+    });
+  }
+
+  const termTrigger = document.querySelector(".term");
+  if (termTrigger) {
+    termTrigger.addEventListener("click", function (event) {
+      event.preventDefault();
+      toggleDropdownMenu("term_dropdown");
+    });
+  }
+
+  const filterTrigger = document.querySelector(".filter");
+  if (filterTrigger) {
+    filterTrigger.addEventListener("click", function (event) {
+      event.preventDefault();
+      toggleDropdownMenu("filter_dropdown");
+    });
+  }
+
   function formatSelection(items, maxChars) {
+    if (items.length === 0) return "";
+    if (items.length === 1) {
+      return items[0].length > maxChars
+        ? items[0].substring(0, maxChars)
+        : items[0];
+    }
     let result = "";
     let count = 0;
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       const separator = result ? ", " : "";
-      if ((result + separator + item).length <= maxChars) {
+      const potentialLength = result.length + separator.length + item.length;
+      if (potentialLength <= maxChars) {
         result += separator + item;
         count++;
+      } else if (result === "" && item.length > maxChars) {
+        result = item.substring(0, maxChars);
+        count++;
+        break;
       } else {
         break;
       }
@@ -361,14 +314,25 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     return result;
   }
+
+  // Исправленная функция updateFilterText
   function updateFilterText(inputId, items, labelText, defaultText) {
     const selectionText =
-      items.length > 0 ? formatSelection(items, 14) : defaultText;
+      items.length > 0 ? formatSelection(items, 10) : defaultText;
     const inputEl = document.getElementById(inputId);
     if (inputEl) {
-      inputEl.innerHTML = `${labelText}<br/><span class="sub_text">${selectionText}</span>`;
+      if (inputId === "filter_input_mobile") {
+        const subTextEl = inputEl.querySelector(".sub_text");
+        if (subTextEl) {
+          subTextEl.textContent = selectionText;
+        }
+      } else {
+        inputEl.innerHTML = `${labelText}<br/><span class="sub_text">${selectionText}</span>`;
+      }
     }
   }
+
+  // Обработчики кнопок "Сохранить" для фильтров
   const districtSaveBtn = document.getElementById("district_saveButton");
   if (districtSaveBtn) {
     districtSaveBtn.addEventListener("click", function (e) {
@@ -380,11 +344,12 @@ document.addEventListener("DOMContentLoaded", function () {
         "district_input",
         selectedDistricts,
         "Район",
-        "один или несколько"
+        "мультивыбор"
       );
       closeDropdownMenu("district_dropdown");
     });
   }
+
   const typeSaveBtn = document.getElementById("type_saveButton");
   if (typeSaveBtn) {
     typeSaveBtn.addEventListener("click", function (e) {
@@ -392,71 +357,66 @@ document.addEventListener("DOMContentLoaded", function () {
       const selectedTypes = Array.from(
         document.querySelectorAll(".type input[type='checkbox']:checked")
       ).map((checkbox) => checkbox.nextElementSibling.textContent.trim());
-      updateFilterText(
-        "type_input",
-        selectedTypes,
-        "Тип жилья",
-        "один или несколько"
-      );
+      updateFilterText("type_input", selectedTypes, "Тип жилья", "мультивыбор");
       closeDropdownMenu("type_dropdown");
     });
   }
-  const searchButton = document.querySelector(".search_buttom");
-  if (searchButton) {
-    searchButton.addEventListener("click", function (e) {
-      e.preventDefault();
-      const selectedDistricts = Array.from(
-        document.querySelectorAll(".district input[type='checkbox']:checked")
-      ).map((checkbox) => checkbox.id);
-      const selectedTypes = Array.from(
-        document.querySelectorAll(".type input[type='checkbox']:checked")
-      ).map((checkbox) => checkbox.id);
-      const roomsFrom = document.getElementById("rooms_from")
-        ? document.getElementById("rooms_from").value
-        : "";
-      const roomsTo = document.getElementById("rooms_to")
-        ? document.getElementById("rooms_to").value
-        : "";
-      const selectedRooms = Array.from(
-        document.querySelectorAll(".rooms .rooms_btn.selected")
-      ).map((btn) => btn.textContent.trim());
-      const priceFrom = document.getElementById("price_from")
-        ? document.getElementById("price_from").value
-        : "";
-      const priceTo = document.getElementById("price_to")
-        ? document.getElementById("price_to").value
-        : "";
-      const selectedPriceButton = document.querySelector(
-        ".price .choose_price.selected"
-      );
-      let chosenPrice = "";
-      if (selectedPriceButton) {
-        chosenPrice =
-          selectedPriceButton.dataset.price ||
-          selectedPriceButton.textContent.trim();
-      }
-      const queryParams = {
-        district: selectedDistricts.join(","),
-        type: selectedTypes.join(","),
-        rooms:
-          roomsFrom || roomsTo
-            ? `${roomsFrom}-${roomsTo}`
-            : selectedRooms.join(","),
-        price: priceFrom || priceTo ? `${priceFrom}-${priceTo}` : chosenPrice,
-      };
-      Object.keys(queryParams).forEach((key) => {
-        if (!queryParams[key]) {
-          delete queryParams[key];
-        }
-      });
-      const queryString = new URLSearchParams(queryParams).toString();
-      window.location.href = "search_results.html?" + queryString;
+
+  const termSaveBtn = document.getElementById("term_saveButton");
+  if (termSaveBtn) {
+    termSaveBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const selectedTerms = Array.from(
+        document.querySelectorAll(".term input[type='checkbox']:checked")
+      ).map((checkbox) => checkbox.nextElementSibling.textContent.trim());
+      updateFilterText("term_input", selectedTerms, "Срок", "мультивыбор");
+      closeDropdownMenu("term_dropdown");
     });
   }
 
-  // =============================
-  // === Слайдер для карточек на главной странице =========
-  // =============================
+  const filterSaveBtn = document.getElementById("filter_saveButton");
+  if (filterSaveBtn) {
+    filterSaveBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const selectedFilters = Array.from(
+        document.querySelectorAll(".filter input[type='checkbox']:checked")
+      ).map((checkbox) => checkbox.nextElementSibling.textContent.trim());
+      updateFilterText(
+        "filter_input_mobile",
+        selectedFilters,
+        "Фильтр",
+        "мультивыбор"
+      );
+      closeDropdownMenu("filter_dropdown");
+    });
+  }
+
+  const priceSaveBtn = document.getElementById("price_saveButton");
+  if (priceSaveBtn) {
+    priceSaveBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const priceFrom = document.getElementById("price_from").value;
+      const priceTo = document.getElementById("price_to").value;
+      const selectedPriceButton = document.querySelector(
+        ".price .choose_price.selected"
+      );
+      const pricePeriod = selectedPriceButton
+        ? selectedPriceButton.getAttribute("value")
+        : "в мес";
+
+      let displayText = "мультивыбор";
+      if (priceFrom || priceTo) {
+        const fromValue = priceFrom || "0";
+        const toValue = priceTo || "999";
+        displayText = `${fromValue}-${toValue} ${pricePeriod}`;
+      }
+
+      updateFilterText("price_input", [], "Цена", displayText);
+      closeDropdownMenu("price_dropdown");
+    });
+  }
+
+  // Слайдер для карточек на главной странице
   document.querySelectorAll(".card").forEach((card) => {
     const container = card.querySelector(".card_image_svg");
     const images = container.querySelectorAll("img.slider_image");
@@ -484,6 +444,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     let currentIndex = 0;
+
     if (images.length > 0) {
       images.forEach((img, index) => {
         img.classList.toggle("active", index === 0);
@@ -512,48 +473,9 @@ document.addEventListener("DOMContentLoaded", function () {
       images[currentIndex].classList.add("active");
       updateDots();
     });
-
-    if (window.innerWidth <= 550) {
-      leftBtn.style.display = "flex";
-      rightBtn.style.display = "flex";
-      let touchstartX = 0;
-      let touchendX = 0;
-      const threshold = 30;
-      container.addEventListener(
-        "touchstart",
-        function (event) {
-          touchstartX = event.changedTouches[0].screenX;
-        },
-        false
-      );
-      container.addEventListener(
-        "touchend",
-        function (event) {
-          touchendX = event.changedTouches[0].screenX;
-          handleGesture();
-        },
-        false
-      );
-      function handleGesture() {
-        if (touchendX < touchstartX - threshold) {
-          images[currentIndex].classList.remove("active");
-          currentIndex = (currentIndex + 1) % images.length;
-          images[currentIndex].classList.add("active");
-          updateDots();
-        }
-        if (touchendX > touchstartX + threshold) {
-          images[currentIndex].classList.remove("active");
-          currentIndex = (currentIndex - 1 + images.length) % images.length;
-          images[currentIndex].classList.add("active");
-          updateDots();
-        }
-      }
-    }
   });
 
-  // =============================
-  // === Слайдер (галерея на странице описания) =================
-  // =============================
+  // Слайдер (галерея на странице описания)
   const sliderEl = document.querySelector(".slider");
   const sliderContainer = document.querySelector(".slider_container");
   const sliderBtnLeft = document.querySelector(".slider_btn_left");
@@ -566,6 +488,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let slideIndex = -1;
 
   function changePicture(dir) {
+    console.log("Changing picture, direction:", dir);
     if (dir === "left") {
       slideIndex = slideIndex > 0 ? slideIndex - 1 : sliderImages.length - 1;
     } else if (dir === "right") {
@@ -573,42 +496,74 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     const img = sliderImages[slideIndex];
     if (img && mainPhotoEl) {
-      mainPhotoEl.src = img.src;
+      console.log("Setting image URL:", img.currentSrc);
+      mainPhotoEl.src = img.currentSrc;
+      adjustMainPhoto();
+      const blurredBg = document.querySelector(".blurred_background");
+      if (blurredBg) {
+        blurredBg.style.backgroundImage = `url(${img.currentSrc})`;
+      }
+    } else {
+      console.log("Image or mainPhotoEl not found at index:", slideIndex);
     }
   }
 
   function openSlider(img) {
-    slideIndex = sliderImages.findIndex(
-      (thumbnail) => thumbnail.src === img.src
+    const imgName = img.src.split("/").pop().split(".")[0];
+    const galleryImg = sliderImages.find((thumbnail) =>
+      thumbnail.src.includes(imgName)
     );
+    slideIndex = sliderImages.indexOf(galleryImg);
     if (slideIndex === -1) slideIndex = 0;
-    if (mainPhotoEl) {
-      mainPhotoEl.src = img.src;
+    if (mainPhotoEl && galleryImg) {
+      mainPhotoEl.src = galleryImg.currentSrc;
+      adjustMainPhoto();
+      const blurredBg = document.querySelector(".blurred_background");
+      if (blurredBg) {
+        blurredBg.style.backgroundImage = `url(${galleryImg.currentSrc})`;
+      }
     }
-    console.log("Открываю слайдер. slideIndex =", slideIndex, "src =", img.src);
     if (sliderEl) sliderEl.classList.add("active");
     if (sliderBtnLeft) sliderBtnLeft.style.display = "block";
     if (sliderBtnRight) sliderBtnRight.style.display = "block";
   }
 
+  function adjustMainPhoto() {
+    const img = mainPhotoEl;
+    if (img && img.naturalWidth > img.naturalHeight) {
+      img.style.width = "100%";
+      img.style.height = "auto";
+    } else if (img) {
+      img.style.width = "auto";
+      img.style.height = "100%";
+    }
+  }
+
+  if (mainPhotoEl) {
+    mainPhotoEl.addEventListener("load", adjustMainPhoto);
+    mainPhotoEl.addEventListener("error", () => {
+      console.error("Failed to load image:", mainPhotoEl.src);
+    });
+  }
+
   if (sliderImages.length > 0 && sliderEl && mainPhotoEl) {
+    const cardElements = Array.from(
+      document.querySelectorAll(".section_gallery > div img")
+    );
+    cardElements.forEach((img) => {
+      img.addEventListener("click", (event) => {
+        event.preventDefault();
+        openSlider(img);
+      });
+    });
+
     sliderImages.forEach((thumbnail) => {
       thumbnail.addEventListener("click", (event) => {
         event.preventDefault();
         openSlider(thumbnail);
       });
     });
-    const cardElements = Array.from(
-      document.querySelectorAll(".section_gallery > div")
-    );
-    cardElements.forEach((card) => {
-      card.addEventListener("click", (event) => {
-        const img = event.target.closest("img");
-        if (img) {
-          openSlider(img);
-        }
-      });
-    });
+
     if (sliderBtnLeft) {
       sliderBtnLeft.addEventListener("click", (event) => {
         event.preventDefault();
@@ -631,98 +586,169 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // =============================
-  // === Мобильный слайдер для главного фото (при ≤800px) ============
-  // =============================
-  if (window.innerWidth <= 800) {
-    const mainPhotoImg = document.querySelector(".main_photo img");
-    const mainPhotoContainer = document.querySelector(".main_photo");
-    const mobileImages = Array.from(
-      document.querySelectorAll(".slider_gallery .thumbnail")
-    ).map((img) => img.src);
-    let currentMobileIndex = mobileImages.indexOf(mainPhotoImg.src);
-    if (currentMobileIndex === -1) currentMobileIndex = 0;
-
-    let mobileDotsContainer = mainPhotoContainer.querySelector(".slider_dots");
-    if (!mobileDotsContainer) {
-      mobileDotsContainer = document.createElement("div");
-      mobileDotsContainer.classList.add("slider_dots");
-      mainPhotoContainer.appendChild(mobileDotsContainer);
-    }
-    mobileDotsContainer.innerHTML = "";
-    mobileImages.forEach((src, index) => {
-      const dot = document.createElement("span");
-      dot.classList.add("dot");
-      if (index === currentMobileIndex) {
-        dot.classList.add("active");
+  // Работа стрелки и Esc в слайдере
+  document.addEventListener("keydown", function (event) {
+    if (sliderEl && sliderEl.classList.contains("active")) {
+      switch (event.key) {
+        case "ArrowLeft":
+          changePicture("left");
+          break;
+        case "ArrowRight":
+          changePicture("right");
+          break;
+        case "Escape":
+          sliderEl.classList.remove("active");
+          if (sliderBtnLeft) sliderBtnLeft.style.display = "none";
+          if (sliderBtnRight) sliderBtnRight.style.display = "none";
+          break;
       }
-      dot.addEventListener("click", () => {
-        currentMobileIndex = index;
-        mainPhotoImg.src = mobileImages[currentMobileIndex];
-        updateMobileDots();
-      });
-      mobileDotsContainer.appendChild(dot);
-    });
-
-    function updateMobileDots() {
-      const dots = mobileDotsContainer.querySelectorAll(".dot");
-      dots.forEach((dot, index) => {
-        dot.classList.toggle("active", index === currentMobileIndex);
-      });
     }
+  });
 
-    const mobileLeftBtn = document.querySelector(".main_slider_btn_left");
-    const mobileRightBtn = document.querySelector(".main_slider_btn_right");
-
-    if (mobileLeftBtn) {
-      mobileLeftBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        currentMobileIndex =
-          currentMobileIndex > 0
-            ? currentMobileIndex - 1
-            : mobileImages.length - 1;
-        mainPhotoImg.src = mobileImages[currentMobileIndex];
-        updateMobileDots();
-      });
+  // Работа ESC в Information
+  document.addEventListener("keydown", function (event) {
+    const informationMenu = document.getElementById("informationMenu");
+    if (
+      informationMenu &&
+      informationMenu.classList.contains("active") &&
+      event.key === "Escape"
+    ) {
+      closeInformationMenu();
     }
-    if (mobileRightBtn) {
-      mobileRightBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        currentMobileIndex =
-          currentMobileIndex < mobileImages.length - 1
-            ? currentMobileIndex + 1
-            : 0;
-        mainPhotoImg.src = mobileImages[currentMobileIndex];
-        updateMobileDots();
+  });
+
+  // Мобильный слайдер для главного фото (при ≤750px)
+  if (window.innerWidth <= 750) {
+    const mainPhotoContainer = document.querySelector(".main_photo");
+    const mainPhotoImg = document.querySelector(".main_photo img");
+    const mainPicture = document.querySelector(".main_photo picture");
+    const sliderGalleryItems = document.querySelectorAll(
+      ".slider_gallery > div"
+    );
+
+    if (mainPhotoImg && mainPhotoContainer) {
+      let mobileImages = Array.from(sliderGalleryItems).map((item) => {
+        const source = item.querySelector("source[type='image/avif']");
+        const img = item.querySelector("img.thumbnail");
+        return source ? source.srcset : img.src;
       });
+
+      if (mobileImages.length === 0) {
+        const mainSource = mainPicture?.querySelector(
+          "source[type='image/avif']"
+        );
+        mobileImages = [mainSource ? mainSource.srcset : mainPhotoImg.src];
+      }
+
+      let currentMobileIndex = 0;
+
+      const mainPhotoSrc =
+        mainPicture?.querySelector("source[type='image/avif']")?.srcset ||
+        mainPhotoImg.src;
+      currentMobileIndex = mobileImages.indexOf(mainPhotoSrc);
+      if (currentMobileIndex === -1) currentMobileIndex = 0;
+
+      let mobileDotsContainer =
+        mainPhotoContainer.querySelector(".slider_dots");
+      if (!mobileDotsContainer) {
+        mobileDotsContainer = document.createElement("div");
+        mobileDotsContainer.classList.add("slider_dots");
+        mainPhotoContainer.appendChild(mobileDotsContainer);
+      }
+      mobileDotsContainer.innerHTML = "";
+
+      mobileImages.forEach((src, index) => {
+        const dot = document.createElement("span");
+        dot.classList.add("dot");
+        if (index === currentMobileIndex) dot.classList.add("active");
+        dot.addEventListener("click", () => {
+          currentMobileIndex = index;
+          updateMainPhoto(mobileImages[currentMobileIndex]);
+          updateMobileDots();
+        });
+        mobileDotsContainer.appendChild(dot);
+      });
+
+      function updateMainPhoto(src) {
+        console.log("Updating mobile photo with src:", src);
+        if (mainPicture) {
+          const source = mainPicture.querySelector("source[type='image/avif']");
+          if (source) {
+            source.srcset = src.endsWith(".avif")
+              ? src
+              : src.replace(".jpg", ".avif");
+            mainPhotoImg.src = src.endsWith(".avif")
+              ? src.replace(".avif", ".jpg")
+              : src;
+            console.log(
+              "Set source.srcset:",
+              source.srcset,
+              "img.src:",
+              mainPhotoImg.src
+            );
+          } else {
+            mainPhotoImg.src = src;
+          }
+        } else {
+          mainPhotoImg.src = src;
+        }
+      }
+
+      function updateMobileDots() {
+        const dots = mobileDotsContainer.querySelectorAll(".dot");
+        dots.forEach((dot, index) => {
+          dot.classList.toggle("active", index === currentMobileIndex);
+        });
+      }
+
+      const mobileLeftBtn = document.querySelector(".main_slider_btn_left");
+      const mobileRightBtn = document.querySelector(".main_slider_btn_right");
+
+      if (mobileImages.length <= 1) {
+        if (mobileLeftBtn) mobileLeftBtn.style.display = "none";
+        if (mobileRightBtn) mobileRightBtn.style.display = "none";
+        mobileDotsContainer.style.display = "none";
+      } else {
+        if (mobileLeftBtn) mobileLeftBtn.style.display = "";
+        if (mobileRightBtn) mobileRightBtn.style.display = "";
+        mobileDotsContainer.style.display = "";
+      }
+
+      if (mobileLeftBtn) {
+        mobileLeftBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          currentMobileIndex =
+            currentMobileIndex > 0
+              ? currentMobileIndex - 1
+              : mobileImages.length - 1;
+          updateMainPhoto(mobileImages[currentMobileIndex]);
+          updateMobileDots();
+        });
+      }
+
+      if (mobileRightBtn) {
+        mobileRightBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          currentMobileIndex =
+            currentMobileIndex < mobileImages.length - 1
+              ? currentMobileIndex + 1
+              : 0;
+          updateMainPhoto(mobileImages[currentMobileIndex]);
+          updateMobileDots();
+        });
+      }
     }
   }
 
-  // =============================
-  // === Изменение цвета иконки STAR =========
-  // =============================
+  // Изменение цвета иконки STAR
   document.querySelectorAll(".star_icon").forEach(function (star) {
-    function handleStarClick(e) {
-      e.preventDefault(); // Предотвращаем стандартное поведение
-      e.stopPropagation(); // Останавливаем распространение события
-      star.classList.toggle("selected"); // Переключаем класс
-    }
-
-    // Обработка клика мышью
-    star.addEventListener("click", handleStarClick);
-
-    // Обработка касания на мобильных устройствах
-    star.addEventListener("touchend", handleStarClick);
-
-    // Предотвращаем запуск события touchend на родительском элементе
-    star.addEventListener("touchstart", function (e) {
-      e.stopPropagation(); // Останавливаем распространение на touchstart
+    star.addEventListener("click", function (e) {
+      e.stopPropagation();
+      star.classList.toggle("selected");
     });
   });
 
-  // =============================
-  // === Отправка жалобы =========
-  // =============================
+  // Отправка жалобы (второй оверлей)
   const complaintLink = document.getElementById("complaintLink");
   const complaintMenu = document.getElementById("complaintMenu");
   const complaintOverlay = document.getElementById("complaintOverlay");
@@ -731,16 +757,19 @@ document.addEventListener("DOMContentLoaded", function () {
     if (complaintMenu) complaintMenu.classList.add("active");
     if (complaintOverlay) complaintOverlay.classList.add("active");
   }
+
   function closeComplaintMenu() {
     if (complaintMenu) complaintMenu.classList.remove("active");
     if (complaintOverlay) complaintOverlay.classList.remove("active");
   }
+
   if (complaintLink) {
     complaintLink.addEventListener("click", function (e) {
       e.preventDefault();
       openComplaintMenu();
     });
   }
+
   const closeComplaintButton = document.querySelector(
     ".close_complaint_button"
   );
@@ -750,9 +779,12 @@ document.addEventListener("DOMContentLoaded", function () {
       closeComplaintMenu();
     });
   }
+
+  // Закрытие complaintMenu при клике вне его
   document.addEventListener("click", function (e) {
     if (
       complaintMenu &&
+      complaintMenu.classList.contains("active") &&
       !complaintMenu.contains(e.target) &&
       complaintLink &&
       !complaintLink.contains(e.target)
@@ -760,91 +792,131 @@ document.addEventListener("DOMContentLoaded", function () {
       closeComplaintMenu();
     }
   });
+
   if (complaintMenu) {
     complaintMenu.addEventListener("click", function (e) {
       e.stopPropagation();
     });
   }
+
+  // Логика для информационного меню (первый оверлей)
+  const informationButton = document.getElementById("informationButton");
+  const informationMenu = document.getElementById("informationMenu");
+  const informationOverlay = document.getElementById("overlay");
+  const closeButton = document.querySelector(".close_button");
+
+  function openInformationMenu() {
+    if (informationMenu) informationMenu.classList.add("active");
+    if (informationOverlay) informationOverlay.classList.add("active");
+  }
+
+  function closeInformationMenu() {
+    if (informationMenu) informationMenu.classList.remove("active");
+    if (informationOverlay) informationOverlay.classList.remove("active");
+  }
+
+  function openLink(url) {
+    window.open(url, "_blank");
+  }
+
+  if (informationButton) {
+    informationButton.addEventListener("click", function (e) {
+      e.preventDefault();
+      openInformationMenu();
+    });
+  }
+
+  if (closeButton) {
+    closeButton.addEventListener("click", function (e) {
+      e.preventDefault();
+      closeInformationMenu();
+    });
+  }
+
+  // Закрытие informationMenu при клике вне его
+  document.addEventListener("click", function (event) {
+    if (
+      informationMenu &&
+      informationMenu.classList.contains("active") &&
+      !informationMenu.contains(event.target) &&
+      informationButton &&
+      !informationButton.contains(event.target)
+    ) {
+      closeInformationMenu();
+    }
+  });
+
+  console.log("Script initialization completed");
 });
 
-// ================
-// === Окно information =========
-function openInformationMenu() {
-  const informationMenu = document.getElementById("informationMenu");
-  const informationOverlay = document.getElementById("overlay");
-  if (informationMenu && informationOverlay) {
-    informationMenu.classList.add("active");
-    informationOverlay.classList.add("active");
-  }
-}
-window.openInformationMenu = openInformationMenu;
-
-function closeInformationMenu() {
-  const informationMenu = document.getElementById("informationMenu");
-  const informationOverlay = document.getElementById("overlay");
-  if (informationMenu && informationOverlay) {
-    informationMenu.classList.remove("active");
-    informationOverlay.classList.remove("active");
-  }
-}
-window.closeInformationMenu = closeInformationMenu;
-
-const informationButton = document.getElementById("informationButton");
-if (informationButton) {
-  informationButton.addEventListener("click", function (e) {
-    e.preventDefault();
-    openInformationMenu();
-  });
-}
-const closeInformationButton = document.getElementById(
-  "closeInformationButton"
+// Блокировка масштабирования на мобиле пальцами или двойным тапом
+document.addEventListener(
+  "touchmove",
+  function (event) {
+    if (event.touches.length > 1) {
+      event.preventDefault();
+    }
+  },
+  { passive: false }
 );
-if (closeInformationButton) {
-  closeInformationButton.addEventListener("click", function (e) {
-    e.preventDefault();
-    closeInformationMenu();
-  });
-}
-const informationOverlay = document.getElementById("overlay");
-if (informationOverlay) {
-  informationOverlay.addEventListener("click", function (e) {
-    closeInformationMenu();
-  });
-}
 
+document.addEventListener(
+  "dblclick",
+  function (event) {
+    event.preventDefault();
+  },
+  { passive: false }
+);
 
-// =============================
-// === ПРОКРУТКА ВВЕРХ GO-TOP =========
-// =============================
+let lastTouchEnd = 0;
+document.addEventListener(
+  "touchend",
+  function (event) {
+    const now = new Date().getTime();
+    if (now - lastTouchEnd <= 300) {
+      event.preventDefault();
+    }
+    lastTouchEnd = now;
+  },
+  { passive: false }
+);
 
-const goTopBtn = document.querySelector(".go-top");
-
-// ПРОКРУТКА КНОПКИ
-window.addEventListener("scroll", trackScroll);
-
-// Добавляем обработчик клика на кнопку
-goTopBtn.addEventListener("click", goTop);
-
-// Функция для отслеживания прокрутки
-function trackScroll() {
-  const scrolled = window.scrollY; // Получаем текущую прокрутку
-  const coords = document.documentElement.clientHeight; // Высота видимой области окна
-
-  // Если прокрутили вниз больше, чем на высоту окна
-  if (scrolled > coords) {
-    goTopBtn.classList.add("go-top--show"); // Показываем кнопку
-  } else {
-    goTopBtn.classList.remove("go-top--show"); // Скрываем кнопку
+// Функция restoreFromLocalStorage
+function restoreFromLocalStorage() {
+  const selectedDistricts = localStorage.getItem("selectedDistricts");
+  const selectedTypes = localStorage.getItem("selectedTypes");
+  const selectedTerms = localStorage.getItem("selectedTerms");
+  const selectedFilters = localStorage.getItem("selectedFilters");
+  if (selectedDistricts) {
+    JSON.parse(selectedDistricts).forEach((district) => {
+      const checkbox = document.querySelector(
+        `.district input[type='checkbox'][value='${district}']`
+      );
+      if (checkbox) checkbox.checked = true;
+    });
   }
-}
-
-// Функция для плавной прокрутки вверх
-function goTop() {
-  if (window.scrollY > 0) {
-    // Используем requestAnimationFrame для плавной прокрутки
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth", // Плавная прокрутка
+  if (selectedTypes) {
+    JSON.parse(selectedTypes).forEach((type) => {
+      const checkbox = document.querySelector(
+        `.type input[type='checkbox'][value='${type}']`
+      );
+      if (checkbox) checkbox.checked = true;
+    });
+  }
+  if (selectedTerms) {
+    JSON.parse(selectedTerms).forEach((term) => {
+      const checkbox = document.querySelector(
+        `.term input[type='checkbox'][value='${term}']`
+      );
+      if (checkbox) checkbox.checked = true;
+    });
+  }
+  if (selectedFilters) {
+    JSON.parse(selectedFilters).forEach((filter) => {
+      const checkbox = document.querySelector(
+        `.filter input[type='checkbox'][value='${filter}']`
+      );
+      if (checkbox) checkbox.checked = true;
     });
   }
 }
