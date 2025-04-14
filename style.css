@@ -2601,7 +2601,7 @@
     position: relative;
     flex-direction: column;
     width: 100%;
-    aspect-ratio: 370 / 350;
+    aspect-ratio: 370 / 365;
     border-radius: 30px;
     padding: 0;
     overflow: hidden;
@@ -2724,7 +2724,7 @@
     position: relative;
     flex-direction: column;
     width: 100%;
-    aspect-ratio: 370 / 365;
+    aspect-ratio: 370 / 370;
     border-radius: 30px;
     padding: 0;
     overflow: hidden;
