@@ -417,63 +417,115 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Слайдер для карточек на главной странице
-  document.querySelectorAll(".card").forEach((card) => {
-    const container = card.querySelector(".card_image_svg");
-    const images = container.querySelectorAll("img.slider_image");
-    const leftBtn = card.querySelector(".card_slider_btn_left");
-    const rightBtn = card.querySelector(".card_slider_btn_right");
+document.querySelectorAll(".card").forEach((card) => {
+  const container = card.querySelector(".card_image_svg");
+  const images = container.querySelectorAll("img.slider_image");
+  const leftBtn = card.querySelector(".card_slider_btn_left");
+  const rightBtn = cardmissed call to action: card.querySelector(".card_slider_btn_right");
 
-    let dotsContainer = container.querySelector(".slider_dots");
-    if (!dotsContainer) {
-      dotsContainer = document.createElement("div");
-      dotsContainer.classList.add("slider_dots");
-      container.appendChild(dotsContainer);
-    }
-    dotsContainer.innerHTML = "";
-    images.forEach((img, index) => {
-      const dot = document.createElement("span");
-      dot.classList.add("dot");
-      if (index === 0) dot.classList.add("active");
-      dot.addEventListener("click", () => {
-        images[currentIndex].classList.remove("active");
-        currentIndex = index;
-        images[currentIndex].classList.add("active");
-        updateDots();
-      });
-      dotsContainer.appendChild(dot);
+  let dotsContainer = container.querySelector(".slider_dots");
+  if (!dotsContainer) {
+    dotsContainer = document.createElement("div");
+    dotsContainer.classList.add("slider_dots");
+    container.appendChild(dotsContainer);
+  }
+  dotsContainer.innerHTML = "";
+  images.forEach((img, index) => {
+    const dot = document.createElement("span");
+    dot.classList.add("dot");
+    if (index === 0) dot.classList.add("active");
+    dot.addEventListener("click", () => {
+      images[currentIndex].classList.remove("active");
+      currentIndex = index;
+      images[currentIndex].classList.add("active");
+      updateDots();
     });
+    dotsContainer.appendChild(dot);
+  });
 
-    let currentIndex = 0;
+  let currentIndex = 0;
 
-    if (images.length > 0) {
-      images.forEach((img, index) => {
-        img.classList.toggle("active", index === 0);
-      });
+  if (images.length > 0) {
+    images.forEach((img, index) => {
+      img.classList.toggle("active", index === 0);
+    });
+  }
+
+  function updateDots() {
+    const dots = dotsContainer.querySelectorAll(".dot");
+    dots.forEach((dot, index) => {
+      dot.classList.toggle("active", index === currentIndex);
+    });
+  }
+
+  leftBtn.addEventListener("click", function (event) {
+    event.stopPropagation();
+    images[currentIndex].classList.remove("active");
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    images[currentIndex].classList.add("active");
+    updateDots();
+  });
+
+  rightBtn.addEventListener("click", function (event) {
+    event.stopPropagation();
+    images[currentIndex].classList.remove("active");
+    currentIndex = (currentIndex + 1) % images.length;
+    images[currentIndex].classList.add("active");
+    updateDots();
+  });
+
+  // Добавляем поддержку свайпа
+  let touchStartX = 0;
+  let touchEndX = 0;
+  let isSwiping = false;
+
+  container.addEventListener("touchstart", (event) => {
+    touchStartX = event.changedTouches[0].screenX;
+    isSwiping = false;
+  }, { passive: true });
+
+  container.addEventListener("touchmove", (event) => {
+    touchEndX = event.changedTouches[0].screenX;
+    if (Math.abs(touchEndX - touchStartX) > 10) {
+      isSwiping = true;
     }
+  }, { passive: true });
 
-    function updateDots() {
-      const dots = dotsContainer.querySelectorAll(".dot");
-      dots.forEach((dot, index) => {
-        dot.classList.toggle("active", index === currentIndex);
-      });
+  container.addEventListener("touchend", (event) => {
+    touchEndX = event.changedTouches[0].screenX;
+    if (isSwiping) {
+      handleSwipe();
+      event.stopPropagation(); // Предотвращаем срабатывание onclick
     }
+    isSwiping = false;
+  }, { passive: true });
 
-    leftBtn.addEventListener("click", function (event) {
-      event.stopPropagation();
+  function handleSwipe() {
+    const swipeDistance = touchEndX - touchStartX;
+    const minSwipeDistance = 50; // Минимальное расстояние для свайпа
+
+    if (swipeDistance > minSwipeDistance) {
+      // Свайп вправо (предыдущее изображение)
       images[currentIndex].classList.remove("active");
       currentIndex = (currentIndex - 1 + images.length) % images.length;
       images[currentIndex].classList.add("active");
       updateDots();
-    });
-
-    rightBtn.addEventListener("click", function (event) {
-      event.stopPropagation();
+    } else if (swipeDistance < -minSwipeDistance) {
+      // Свайп влево (следующее изображение)
       images[currentIndex].classList.remove("active");
       currentIndex = (currentIndex + 1) % images.length;
       images[currentIndex].classList.add("active");
       updateDots();
-    });
+    }
+  }
+
+  // Предотвращаем срабатывание onclick на кнопках и свайпе
+  card.addEventListener("click", (event) => {
+    if (event.target.closest(".card_slider_btn") || isSwiping) {
+      event.stopPropagation();
+    }
   });
+});
 
   // Слайдер (галерея на странице описания)
   const sliderEl = document.querySelector(".slider");
