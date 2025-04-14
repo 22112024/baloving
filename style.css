@@ -3396,7 +3396,7 @@
     height: 110px;
     object-fit: cover;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: 20px;
     transition: transform 0.7s ease, box-shadow 0.7s ease;
   }
 
