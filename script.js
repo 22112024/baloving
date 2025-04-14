@@ -417,115 +417,141 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Слайдер для карточек на главной странице
-document.querySelectorAll(".card").forEach((card) => {
-  const container = card.querySelector(".card_image_svg");
-  const images = container.querySelectorAll("img.slider_image");
-  const leftBtn = card.querySelector(".card_slider_btn_left");
-  const rightBtn = cardmissed call to action: card.querySelector(".card_slider_btn_right");
+  document.querySelectorAll(".card").forEach((card) => {
+    const container = card.querySelector(".card_image_svg");
+    const images = container.querySelectorAll("img.slider_image");
+    const leftBtn = card.querySelector(".card_slider_btn_left");
+    const rightBtn = card.querySelector(".card_slider_btn_right");
 
-  let dotsContainer = container.querySelector(".slider_dots");
-  if (!dotsContainer) {
-    dotsContainer = document.createElement("div");
-    dotsContainer.classList.add("slider_dots");
-    container.appendChild(dotsContainer);
-  }
-  dotsContainer.innerHTML = "";
-  images.forEach((img, index) => {
-    const dot = document.createElement("span");
-    dot.classList.add("dot");
-    if (index === 0) dot.classList.add("active");
-    dot.addEventListener("click", () => {
-      images[currentIndex].classList.remove("active");
-      currentIndex = index;
-      images[currentIndex].classList.add("active");
-      updateDots();
-    });
-    dotsContainer.appendChild(dot);
-  });
-
-  let currentIndex = 0;
-
-  if (images.length > 0) {
+    let dotsContainer = container.querySelector(".slider_dots");
+    if (!dotsContainer) {
+      dotsContainer = document.createElement("div");
+      dotsContainer.classList.add("slider_dots");
+      container.appendChild(dotsContainer);
+    }
+    dotsContainer.innerHTML = "";
     images.forEach((img, index) => {
-      img.classList.toggle("active", index === 0);
+      const dot = document.createElement("span");
+      dot.classList.add("dot");
+      if (index === 0) dot.classList.add("active");
+      dot.addEventListener("click", (event) => {
+        event.stopPropagation();
+        images[currentIndex].classList.remove("active");
+        currentIndex = index;
+        images[currentIndex].classList.add("active");
+        updateDots();
+      });
+      dotsContainer.appendChild(dot);
     });
-  }
 
-  function updateDots() {
-    const dots = dotsContainer.querySelectorAll(".dot");
-    dots.forEach((dot, index) => {
-      dot.classList.toggle("active", index === currentIndex);
-    });
-  }
+    let currentIndex = 0;
 
-  leftBtn.addEventListener("click", function (event) {
-    event.stopPropagation();
-    images[currentIndex].classList.remove("active");
-    currentIndex = (currentIndex - 1 + images.length) % images.length;
-    images[currentIndex].classList.add("active");
-    updateDots();
-  });
-
-  rightBtn.addEventListener("click", function (event) {
-    event.stopPropagation();
-    images[currentIndex].classList.remove("active");
-    currentIndex = (currentIndex + 1) % images.length;
-    images[currentIndex].classList.add("active");
-    updateDots();
-  });
-
-  // Добавляем поддержку свайпа
-  let touchStartX = 0;
-  let touchEndX = 0;
-  let isSwiping = false;
-
-  container.addEventListener("touchstart", (event) => {
-    touchStartX = event.changedTouches[0].screenX;
-    isSwiping = false;
-  }, { passive: true });
-
-  container.addEventListener("touchmove", (event) => {
-    touchEndX = event.changedTouches[0].screenX;
-    if (Math.abs(touchEndX - touchStartX) > 10) {
-      isSwiping = true;
+    if (images.length > 0) {
+      images.forEach((img, index) => {
+        img.classList.toggle("active", index === 0);
+      });
     }
-  }, { passive: true });
 
-  container.addEventListener("touchend", (event) => {
-    touchEndX = event.changedTouches[0].screenX;
-    if (isSwiping) {
-      handleSwipe();
-      event.stopPropagation(); // Предотвращаем срабатывание onclick
+    // Скрываем кнопки и точки, если одно изображение
+    if (images.length <= 1) {
+      leftBtn.style.display = "none";
+      rightBtn.style.display = "none";
+      dotsContainer.style.display = "none";
     }
-    isSwiping = false;
-  }, { passive: true });
 
-  function handleSwipe() {
-    const swipeDistance = touchEndX - touchStartX;
-    const minSwipeDistance = 50; // Минимальное расстояние для свайпа
+    function updateDots() {
+      const dots = dotsContainer.querySelectorAll(".dot");
+      dots.forEach((dot, index) => {
+        dot.classList.toggle("active", index === currentIndex);
+      });
+    }
 
-    if (swipeDistance > minSwipeDistance) {
-      // Свайп вправо (предыдущее изображение)
+    leftBtn.addEventListener("click", function (event) {
+      event.stopPropagation();
       images[currentIndex].classList.remove("active");
       currentIndex = (currentIndex - 1 + images.length) % images.length;
       images[currentIndex].classList.add("active");
       updateDots();
-    } else if (swipeDistance < -minSwipeDistance) {
-      // Свайп влево (следующее изображение)
+    });
+
+    rightBtn.addEventListener("click", function (event) {
+      event.stopPropagation();
       images[currentIndex].classList.remove("active");
       currentIndex = (currentIndex + 1) % images.length;
       images[currentIndex].classList.add("active");
       updateDots();
-    }
-  }
+    });
 
-  // Предотвращаем срабатывание onclick на кнопках и свайпе
-  card.addEventListener("click", (event) => {
-    if (event.target.closest(".card_slider_btn") || isSwiping) {
-      event.stopPropagation();
+    // Добавляем поддержку свайпа
+    let touchStartX = 0;
+    let touchEndX = 0;
+    let isSwiping = false;
+
+    container.addEventListener(
+      "touchstart",
+      (event) => {
+        touchStartX = event.changedTouches[0].screenX;
+        isSwiping = false;
+      },
+      { passive: true }
+    );
+
+    container.addEventListener(
+      "touchmove",
+      (event) => {
+        touchEndX = event.changedTouches[0].screenX;
+        const swipeDistance = Math.abs(touchEndX - touchStartX);
+        if (swipeDistance > 10) {
+          isSwiping = true;
+          event.preventDefault(); // Предотвращаем прокрутку страницы при свайпе
+        }
+      },
+      { passive: false }
+    );
+
+    container.addEventListener(
+      "touchend",
+      (event) => {
+        touchEndX = event.changedTouches[0].screenX;
+        if (isSwiping) {
+          handleSwipe();
+          event.stopPropagation(); // Предотвращаем срабатывание onclick
+        }
+      },
+      { passive: true }
+    );
+
+    function handleSwipe() {
+      const swipeDistance = touchEndX - touchStartX;
+      const minSwipeDistance = 50; // Минимальное расстояние для свайпа
+
+      if (swipeDistance > minSwipeDistance) {
+        // Свайп вправо (предыдущее изображение)
+        images[currentIndex].classList.remove("active");
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+        images[currentIndex].classList.add("active");
+        updateDots();
+      } else if (swipeDistance < -minSwipeDistance) {
+        // Свайп влево (следующее изображение)
+        images[currentIndex].classList.remove("active");
+        currentIndex = (currentIndex + 1) % images.length;
+        images[currentIndex].classList.add("active");
+        updateDots();
+      }
     }
+
+    // Предотвращаем срабатывание onclick на кнопках, точках и свайпе
+    card.addEventListener("click", (event) => {
+      if (
+        event.target.closest(".card_slider_btn") ||
+        event.target.closest(".dot") ||
+        event.target.closest(".star_icon") ||
+        isSwiping
+      ) {
+        event.stopPropagation();
+      }
+    });
   });
-});
 
   // Слайдер (галерея на странице описания)
   const sliderEl = document.querySelector(".slider");
@@ -636,6 +662,40 @@ document.querySelectorAll(".card").forEach((card) => {
         if (sliderBtnRight) sliderBtnRight.style.display = "none";
       });
     }
+
+    // Добавляем поддержку свайпа для слайдера на странице описания
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    sliderContainer.addEventListener(
+      "touchstart",
+      (event) => {
+        touchStartX = event.changedTouches[0].screenX;
+      },
+      { passive: true }
+    );
+
+    sliderContainer.addEventListener(
+      "touchend",
+      (event) => {
+        touchEndX = event.changedTouches[0].screenX;
+        handleSwipe();
+      },
+      { passive: true }
+    );
+
+    function handleSwipe() {
+      const swipeDistance = touchEndX - touchStartX;
+      const minSwipeDistance = 50; // Минимальное расстояние для свайпа
+
+      if (swipeDistance > minSwipeDistance) {
+        // Свайп вправо (предыдущее изображение)
+        changePicture("left");
+      } else if (swipeDistance < -minSwipeDistance) {
+        // Свайп влево (следующее изображение)
+        changePicture("right");
+      }
+    }
   }
 
   // Работа стрелки и Esc в слайдере
@@ -670,163 +730,171 @@ document.querySelectorAll(".card").forEach((card) => {
   });
 
   // Мобильный слайдер для главного фото (при ≤750px)
-if (window.innerWidth <= 750) {
-  const mainPhotoContainer = document.querySelector(".main_photo");
-  const mainPhotoImg = document.querySelector(".main_photo img");
-  const mainPicture = document.querySelector(".main_photo picture");
-  const sliderGalleryItems = document.querySelectorAll(
-    ".slider_gallery > div"
-  );
+  if (window.innerWidth <= 750) {
+    const mainPhotoContainer = document.querySelector(".main_photo");
+    const mainPhotoImg = document.querySelector(".main_photo img");
+    const mainPicture = document.querySelector(".main_photo picture");
+    const sliderGalleryItems = document.querySelectorAll(
+      ".slider_gallery > div"
+    );
 
-  if (mainPhotoImg && mainPhotoContainer) {
-    let mobileImages = Array.from(sliderGalleryItems).map((item) => {
-      const source = item.querySelector("source[type='image/avif']");
-      const img = item.querySelector("img.thumbnail");
-      return source ? source.srcset : img.src;
-    });
-
-    if (mobileImages.length === 0) {
-      const mainSource = mainPicture?.querySelector(
-        "source[type='image/avif']"
-      );
-      mobileImages = [mainSource ? mainSource.srcset : mainPhotoImg.src];
-    }
-
-    let currentMobileIndex = 0;
-
-    const mainPhotoSrc =
-      mainPicture?.querySelector("source[type='image/avif']")?.srcset ||
-      mainPhotoImg.src;
-    currentMobileIndex = mobileImages.indexOf(mainPhotoSrc);
-    if (currentMobileIndex === -1) currentMobileIndex = 0;
-
-    let mobileDotsContainer =
-      mainPhotoContainer.querySelector(".slider_dots");
-    if (!mobileDotsContainer) {
-      mobileDotsContainer = document.createElement("div");
-      mobileDotsContainer.classList.add("slider_dots");
-      mainPhotoContainer.appendChild(mobileDotsContainer);
-    }
-    mobileDotsContainer.innerHTML = "";
-
-    mobileImages.forEach((src, index) => {
-      const dot = document.createElement("span");
-      dot.classList.add("dot");
-      if (index === currentMobileIndex) dot.classList.add("active");
-      dot.addEventListener("click", () => {
-        currentMobileIndex = index;
-        updateMainPhoto(mobileImages[currentMobileIndex]);
-        updateMobileDots();
+    if (mainPhotoImg && mainPhotoContainer) {
+      let mobileImages = Array.from(sliderGalleryItems).map((item) => {
+        const source = item.querySelector("source[type='image/avif']");
+        const img = item.querySelector("img.thumbnail");
+        return source ? source.srcset : img.src;
       });
-      mobileDotsContainer.appendChild(dot);
-    });
 
-    function updateMainPhoto(src) {
-      console.log("Updating mobile photo with src:", src);
-      if (mainPicture) {
-        const source = mainPicture.querySelector("source[type='image/avif']");
-        if (source) {
-          source.srcset = src.endsWith(".avif")
-            ? src
-            : src.replace(".jpg", ".avif");
-          mainPhotoImg.src = src.endsWith(".avif")
-            ? src.replace(".avif", ".jpg")
-            : src;
-          console.log(
-            "Set source.srcset:",
-            source.srcset,
-            "img.src:",
-            mainPhotoImg.src
-          );
+      if (mobileImages.length === 0) {
+        const mainSource = mainPicture?.querySelector(
+          "source[type='image/avif']"
+        );
+        mobileImages = [mainSource ? mainSource.srcset : mainPhotoImg.src];
+      }
+
+      let currentMobileIndex = 0;
+
+      const mainPhotoSrc =
+        mainPicture?.querySelector("source[type='image/avif']")?.srcset ||
+        mainPhotoImg.src;
+      currentMobileIndex = mobileImages.indexOf(mainPhotoSrc);
+      if (currentMobileIndex === -1) currentMobileIndex = 0;
+
+      let mobileDotsContainer =
+        mainPhotoContainer.querySelector(".slider_dots");
+      if (!mobileDotsContainer) {
+        mobileDotsContainer = document.createElement("div");
+        mobileDotsContainer.classList.add("slider_dots");
+        mainPhotoContainer.appendChild(mobileDotsContainer);
+      }
+      mobileDotsContainer.innerHTML = "";
+
+      mobileImages.forEach((src, index) => {
+        const dot = document.createElement("span");
+        dot.classList.add("dot");
+        if (index === currentMobileIndex) dot.classList.add("active");
+        dot.addEventListener("click", () => {
+          currentMobileIndex = index;
+          updateMainPhoto(mobileImages[currentMobileIndex]);
+          updateMobileDots();
+        });
+        mobileDotsContainer.appendChild(dot);
+      });
+
+      function updateMainPhoto(src) {
+        console.log("Updating mobile photo with src:", src);
+        if (mainPicture) {
+          const source = mainPicture.querySelector("source[type='image/avif']");
+          if (source) {
+            source.srcset = src.endsWith(".avif")
+              ? src
+              : src.replace(".jpg", ".avif");
+            mainPhotoImg.src = src.endsWith(".avif")
+              ? src.replace(".avif", ".jpg")
+              : src;
+            console.log(
+              "Set source.srcset:",
+              source.srcset,
+              "img.src:",
+              mainPhotoImg.src
+            );
+          } else {
+            mainPhotoImg.src = src;
+          }
         } else {
           mainPhotoImg.src = src;
         }
-      } else {
-        mainPhotoImg.src = src;
       }
-    }
 
-    function updateMobileDots() {
-      const dots = mobileDotsContainer.querySelectorAll(".dot");
-      dots.forEach((dot, index) => {
-        dot.classList.toggle("active", index === currentMobileIndex);
-      });
-    }
+      function updateMobileDots() {
+        const dots = mobileDotsContainer.querySelectorAll(".dot");
+        dots.forEach((dot, index) => {
+          dot.classList.toggle("active", index === currentMobileIndex);
+        });
+      }
 
-    const mobileLeftBtn = document.querySelector(".main_slider_btn_left");
-    const mobileRightBtn = document.querySelector(".main_slider_btn_right");
+      const mobileLeftBtn = document.querySelector(".main_slider_btn_left");
+      const mobileRightBtn = document.querySelector(".main_slider_btn_right");
 
-    if (mobileImages.length <= 1) {
-      if (mobileLeftBtn) mobileLeftBtn.style.display = "none";
-      if (mobileRightBtn) mobileRightBtn.style.display = "none";
-      mobileDotsContainer.style.display = "none";
-    } else {
-      if (mobileLeftBtn) mobileLeftBtn.style.display = "";
-      if (mobileRightBtn) mobileRightBtn.style.display = "";
-      mobileDotsContainer.style.display = "";
-    }
+      if (mobileImages.length <= 1) {
+        if (mobileLeftBtn) mobileLeftBtn.style.display = "none";
+        if (mobileRightBtn) mobileRightBtn.style.display = "none";
+        mobileDotsContainer.style.display = "none";
+      } else {
+        if (mobileLeftBtn) mobileLeftBtn.style.display = "";
+        if (mobileRightBtn) mobileRightBtn.style.display = "";
+        mobileDotsContainer.style.display = "";
+      }
 
-    if (mobileLeftBtn) {
-      mobileLeftBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        currentMobileIndex =
-          currentMobileIndex > 0
-            ? currentMobileIndex - 1
-            : mobileImages.length - 1;
-        updateMainPhoto(mobileImages[currentMobileIndex]);
-        updateMobileDots();
-      });
-    }
+      if (mobileLeftBtn) {
+        mobileLeftBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          currentMobileIndex =
+            currentMobileIndex > 0
+              ? currentMobileIndex - 1
+              : mobileImages.length - 1;
+          updateMainPhoto(mobileImages[currentMobileIndex]);
+          updateMobileDots();
+        });
+      }
 
-    if (mobileRightBtn) {
-      mobileRightBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        currentMobileIndex =
-          currentMobileIndex < mobileImages.length - 1
-            ? currentMobileIndex + 1
-            : 0;
-        updateMainPhoto(mobileImages[currentMobileIndex]);
-        updateMobileDots();
-      });
-    }
+      if (mobileRightBtn) {
+        mobileRightBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          currentMobileIndex =
+            currentMobileIndex < mobileImages.length - 1
+              ? currentMobileIndex + 1
+              : 0;
+          updateMainPhoto(mobileImages[currentMobileIndex]);
+          updateMobileDots();
+        });
+      }
 
-    // Добавляем поддержку свайпа
-    let touchStartX = 0;
-    let touchEndX = 0;
+      // Добавляем поддержку свайпа
+      let touchStartX = 0;
+      let touchEndX = 0;
 
-    mainPhotoContainer.addEventListener("touchstart", (event) => {
-      touchStartX = event.changedTouches[0].screenX;
-    }, { passive: true });
+      mainPhotoContainer.addEventListener(
+        "touchstart",
+        (event) => {
+          touchStartX = event.changedTouches[0].screenX;
+        },
+        { passive: true }
+      );
 
-    mainPhotoContainer.addEventListener("touchend", (event) => {
-      touchEndX = event.changedTouches[0].screenX;
-      handleSwipe();
-    }, { passive: true });
+      mainPhotoContainer.addEventListener(
+        "touchend",
+        (event) => {
+          touchEndX = event.changedTouches[0].screenX;
+          handleMobileSwipe();
+        },
+        { passive: true }
+      );
 
-    function handleSwipe() {
-      const swipeDistance = touchEndX - touchStartX;
-      const minSwipeDistance = 50; // Минимальное расстояние для свайпа
+      function handleMobileSwipe() {
+        const swipeDistance = touchEndX - touchStartX;
+        const minSwipeDistance = 50; // Минимальное расстояние для свайпа
 
-      if (swipeDistance > minSwipeDistance) {
-        // Свайп вправо (предыдущее изображение)
-        currentMobileIndex =
-          currentMobileIndex > 0
-            ? currentMobileIndex - 1
-            : mobileImages.length - 1;
-        updateMainPhoto(mobileImages[currentMobileIndex]);
-        updateMobileDots();
-      } else if (swipeDistance < -minSwipeDistance) {
-        // Свайп влево (следующее изображение)
-        currentMobileIndex =
-          currentMobileIndex < mobileImages.length - 1
-            ? currentMobileIndex + 1
-            : 0;
-        updateMainPhoto(mobileImages[currentMobileIndex]);
-        updateMobileDots();
+        if (swipeDistance > minSwipeDistance) {
+          // Свайп вправо (предыдущее изображение)
+          currentMobileIndex =
+            currentMobileIndex > 0
+              ? currentMobileIndex - 1
+              : mobileImages.length - 1;
+          updateMainPhoto(mobileImages[currentMobileIndex]);
+          updateMobileDots();
+        } else if (swipeDistance < -minSwipeDistance) {
+          // Свайп влево (следующее изображение)
+          currentMobileIndex =
+            currentMobileIndex < mobileImages.length - 1
+              ? currentMobileIndex + 1
+              : 0;
+          updateMainPhoto(mobileImages[currentMobileIndex]);
+          updateMobileDots();
+        }
       }
     }
   }
-}
 
   // Изменение цвета иконки STAR
   document.querySelectorAll(".star_icon").forEach(function (star) {
