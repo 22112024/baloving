@@ -434,8 +434,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const dot = document.createElement("span");
       dot.classList.add("dot");
       if (index === 0) dot.classList.add("active");
-      dot.addEventListener("click", (event) => {
-        event.stopPropagation();
+      dot.addEventListener("click", () => {
         images[currentIndex].classList.remove("active");
         currentIndex = index;
         images[currentIndex].classList.add("active");
@@ -450,13 +449,6 @@ document.addEventListener("DOMContentLoaded", function () {
       images.forEach((img, index) => {
         img.classList.toggle("active", index === 0);
       });
-    }
-
-    // Скрываем кнопки и точки, если одно изображение
-    if (images.length <= 1) {
-      leftBtn.style.display = "none";
-      rightBtn.style.display = "none";
-      dotsContainer.style.display = "none";
     }
 
     function updateDots() {
@@ -480,76 +472,6 @@ document.addEventListener("DOMContentLoaded", function () {
       currentIndex = (currentIndex + 1) % images.length;
       images[currentIndex].classList.add("active");
       updateDots();
-    });
-
-    // Добавляем поддержку свайпа
-    let touchStartX = 0;
-    let touchEndX = 0;
-    let isSwiping = false;
-
-    container.addEventListener(
-      "touchstart",
-      (event) => {
-        touchStartX = event.changedTouches[0].screenX;
-        isSwiping = false;
-      },
-      { passive: true }
-    );
-
-    container.addEventListener(
-      "touchmove",
-      (event) => {
-        touchEndX = event.changedTouches[0].screenX;
-        const swipeDistance = Math.abs(touchEndX - touchStartX);
-        if (swipeDistance > 10) {
-          isSwiping = true;
-          event.preventDefault(); // Предотвращаем прокрутку страницы при свайпе
-        }
-      },
-      { passive: false }
-    );
-
-    container.addEventListener(
-      "touchend",
-      (event) => {
-        touchEndX = event.changedTouches[0].screenX;
-        if (isSwiping) {
-          handleSwipe();
-          event.stopPropagation(); // Предотвращаем срабатывание onclick
-        }
-      },
-      { passive: true }
-    );
-
-    function handleSwipe() {
-      const swipeDistance = touchEndX - touchStartX;
-      const minSwipeDistance = 50; // Минимальное расстояние для свайпа
-
-      if (swipeDistance > minSwipeDistance) {
-        // Свайп вправо (предыдущее изображение)
-        images[currentIndex].classList.remove("active");
-        currentIndex = (currentIndex - 1 + images.length) % images.length;
-        images[currentIndex].classList.add("active");
-        updateDots();
-      } else if (swipeDistance < -minSwipeDistance) {
-        // Свайп влево (следующее изображение)
-        images[currentIndex].classList.remove("active");
-        currentIndex = (currentIndex + 1) % images.length;
-        images[currentIndex].classList.add("active");
-        updateDots();
-      }
-    }
-
-    // Предотвращаем срабатывание onclick на кнопках, точках и свайпе
-    card.addEventListener("click", (event) => {
-      if (
-        event.target.closest(".card_slider_btn") ||
-        event.target.closest(".dot") ||
-        event.target.closest(".star_icon") ||
-        isSwiping
-      ) {
-        event.stopPropagation();
-      }
     });
   });
 
@@ -661,40 +583,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (sliderBtnLeft) sliderBtnLeft.style.display = "none";
         if (sliderBtnRight) sliderBtnRight.style.display = "none";
       });
-    }
-
-    // Добавляем поддержку свайпа для слайдера на странице описания
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    sliderContainer.addEventListener(
-      "touchstart",
-      (event) => {
-        touchStartX = event.changedTouches[0].screenX;
-      },
-      { passive: true }
-    );
-
-    sliderContainer.addEventListener(
-      "touchend",
-      (event) => {
-        touchEndX = event.changedTouches[0].screenX;
-        handleSwipe();
-      },
-      { passive: true }
-    );
-
-    function handleSwipe() {
-      const swipeDistance = touchEndX - touchStartX;
-      const minSwipeDistance = 50; // Минимальное расстояние для свайпа
-
-      if (swipeDistance > minSwipeDistance) {
-        // Свайп вправо (предыдущее изображение)
-        changePicture("left");
-      } else if (swipeDistance < -minSwipeDistance) {
-        // Свайп влево (следующее изображение)
-        changePicture("right");
-      }
     }
   }
 
@@ -848,50 +736,6 @@ document.addEventListener("DOMContentLoaded", function () {
           updateMainPhoto(mobileImages[currentMobileIndex]);
           updateMobileDots();
         });
-      }
-
-      // Добавляем поддержку свайпа
-      let touchStartX = 0;
-      let touchEndX = 0;
-
-      mainPhotoContainer.addEventListener(
-        "touchstart",
-        (event) => {
-          touchStartX = event.changedTouches[0].screenX;
-        },
-        { passive: true }
-      );
-
-      mainPhotoContainer.addEventListener(
-        "touchend",
-        (event) => {
-          touchEndX = event.changedTouches[0].screenX;
-          handleMobileSwipe();
-        },
-        { passive: true }
-      );
-
-      function handleMobileSwipe() {
-        const swipeDistance = touchEndX - touchStartX;
-        const minSwipeDistance = 50; // Минимальное расстояние для свайпа
-
-        if (swipeDistance > minSwipeDistance) {
-          // Свайп вправо (предыдущее изображение)
-          currentMobileIndex =
-            currentMobileIndex > 0
-              ? currentMobileIndex - 1
-              : mobileImages.length - 1;
-          updateMainPhoto(mobileImages[currentMobileIndex]);
-          updateMobileDots();
-        } else if (swipeDistance < -minSwipeDistance) {
-          // Свайп влево (следующее изображение)
-          currentMobileIndex =
-            currentMobileIndex < mobileImages.length - 1
-              ? currentMobileIndex + 1
-              : 0;
-          updateMainPhoto(mobileImages[currentMobileIndex]);
-          updateMobileDots();
-        }
       }
     }
   }
