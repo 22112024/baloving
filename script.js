@@ -618,127 +618,163 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Мобильный слайдер для главного фото (при ≤750px)
-  if (window.innerWidth <= 750) {
-    const mainPhotoContainer = document.querySelector(".main_photo");
-    const mainPhotoImg = document.querySelector(".main_photo img");
-    const mainPicture = document.querySelector(".main_photo picture");
-    const sliderGalleryItems = document.querySelectorAll(
-      ".slider_gallery > div"
-    );
+if (window.innerWidth <= 750) {
+  const mainPhotoContainer = document.querySelector(".main_photo");
+  const mainPhotoImg = document.querySelector(".main_photo img");
+  const mainPicture = document.querySelector(".main_photo picture");
+  const sliderGalleryItems = document.querySelectorAll(
+    ".slider_gallery > div"
+  );
 
-    if (mainPhotoImg && mainPhotoContainer) {
-      let mobileImages = Array.from(sliderGalleryItems).map((item) => {
-        const source = item.querySelector("source[type='image/avif']");
-        const img = item.querySelector("img.thumbnail");
-        return source ? source.srcset : img.src;
+  if (mainPhotoImg && mainPhotoContainer) {
+    let mobileImages = Array.from(sliderGalleryItems).map((item) => {
+      const source = item.querySelector("source[type='image/avif']");
+      const img = item.querySelector("img.thumbnail");
+      return source ? source.srcset : img.src;
+    });
+
+    if (mobileImages.length === 0) {
+      const mainSource = mainPicture?.querySelector(
+        "source[type='image/avif']"
+      );
+      mobileImages = [mainSource ? mainSource.srcset : mainPhotoImg.src];
+    }
+
+    let currentMobileIndex = 0;
+
+    const mainPhotoSrc =
+      mainPicture?.querySelector("source[type='image/avif']")?.srcset ||
+      mainPhotoImg.src;
+    currentMobileIndex = mobileImages.indexOf(mainPhotoSrc);
+    if (currentMobileIndex === -1) currentMobileIndex = 0;
+
+    let mobileDotsContainer =
+      mainPhotoContainer.querySelector(".slider_dots");
+    if (!mobileDotsContainer) {
+      mobileDotsContainer = document.createElement("div");
+      mobileDotsContainer.classList.add("slider_dots");
+      mainPhotoContainer.appendChild(mobileDotsContainer);
+    }
+    mobileDotsContainer.innerHTML = "";
+
+    mobileImages.forEach((src, index) => {
+      const dot = document.createElement("span");
+      dot.classList.add("dot");
+      if (index === currentMobileIndex) dot.classList.add("active");
+      dot.addEventListener("click", () => {
+        currentMobileIndex = index;
+        updateMainPhoto(mobileImages[currentMobileIndex]);
+        updateMobileDots();
       });
+      mobileDotsContainer.appendChild(dot);
+    });
 
-      if (mobileImages.length === 0) {
-        const mainSource = mainPicture?.querySelector(
-          "source[type='image/avif']"
-        );
-        mobileImages = [mainSource ? mainSource.srcset : mainPhotoImg.src];
-      }
-
-      let currentMobileIndex = 0;
-
-      const mainPhotoSrc =
-        mainPicture?.querySelector("source[type='image/avif']")?.srcset ||
-        mainPhotoImg.src;
-      currentMobileIndex = mobileImages.indexOf(mainPhotoSrc);
-      if (currentMobileIndex === -1) currentMobileIndex = 0;
-
-      let mobileDotsContainer =
-        mainPhotoContainer.querySelector(".slider_dots");
-      if (!mobileDotsContainer) {
-        mobileDotsContainer = document.createElement("div");
-        mobileDotsContainer.classList.add("slider_dots");
-        mainPhotoContainer.appendChild(mobileDotsContainer);
-      }
-      mobileDotsContainer.innerHTML = "";
-
-      mobileImages.forEach((src, index) => {
-        const dot = document.createElement("span");
-        dot.classList.add("dot");
-        if (index === currentMobileIndex) dot.classList.add("active");
-        dot.addEventListener("click", () => {
-          currentMobileIndex = index;
-          updateMainPhoto(mobileImages[currentMobileIndex]);
-          updateMobileDots();
-        });
-        mobileDotsContainer.appendChild(dot);
-      });
-
-      function updateMainPhoto(src) {
-        console.log("Updating mobile photo with src:", src);
-        if (mainPicture) {
-          const source = mainPicture.querySelector("source[type='image/avif']");
-          if (source) {
-            source.srcset = src.endsWith(".avif")
-              ? src
-              : src.replace(".jpg", ".avif");
-            mainPhotoImg.src = src.endsWith(".avif")
-              ? src.replace(".avif", ".jpg")
-              : src;
-            console.log(
-              "Set source.srcset:",
-              source.srcset,
-              "img.src:",
-              mainPhotoImg.src
-            );
-          } else {
-            mainPhotoImg.src = src;
-          }
+    function updateMainPhoto(src) {
+      console.log("Updating mobile photo with src:", src);
+      if (mainPicture) {
+        const source = mainPicture.querySelector("source[type='image/avif']");
+        if (source) {
+          source.srcset = src.endsWith(".avif")
+            ? src
+            : src.replace(".jpg", ".avif");
+          mainPhotoImg.src = src.endsWith(".avif")
+            ? src.replace(".avif", ".jpg")
+            : src;
+          console.log(
+            "Set source.srcset:",
+            source.srcset,
+            "img.src:",
+            mainPhotoImg.src
+          );
         } else {
           mainPhotoImg.src = src;
         }
-      }
-
-      function updateMobileDots() {
-        const dots = mobileDotsContainer.querySelectorAll(".dot");
-        dots.forEach((dot, index) => {
-          dot.classList.toggle("active", index === currentMobileIndex);
-        });
-      }
-
-      const mobileLeftBtn = document.querySelector(".main_slider_btn_left");
-      const mobileRightBtn = document.querySelector(".main_slider_btn_right");
-
-      if (mobileImages.length <= 1) {
-        if (mobileLeftBtn) mobileLeftBtn.style.display = "none";
-        if (mobileRightBtn) mobileRightBtn.style.display = "none";
-        mobileDotsContainer.style.display = "none";
       } else {
-        if (mobileLeftBtn) mobileLeftBtn.style.display = "";
-        if (mobileRightBtn) mobileRightBtn.style.display = "";
-        mobileDotsContainer.style.display = "";
+        mainPhotoImg.src = src;
       }
+    }
 
-      if (mobileLeftBtn) {
-        mobileLeftBtn.addEventListener("click", function (e) {
-          e.preventDefault();
-          currentMobileIndex =
-            currentMobileIndex > 0
-              ? currentMobileIndex - 1
-              : mobileImages.length - 1;
-          updateMainPhoto(mobileImages[currentMobileIndex]);
-          updateMobileDots();
-        });
-      }
+    function updateMobileDots() {
+      const dots = mobileDotsContainer.querySelectorAll(".dot");
+      dots.forEach((dot, index) => {
+        dot.classList.toggle("active", index === currentMobileIndex);
+      });
+    }
 
-      if (mobileRightBtn) {
-        mobileRightBtn.addEventListener("click", function (e) {
-          e.preventDefault();
-          currentMobileIndex =
-            currentMobileIndex < mobileImages.length - 1
-              ? currentMobileIndex + 1
-              : 0;
-          updateMainPhoto(mobileImages[currentMobileIndex]);
-          updateMobileDots();
-        });
+    const mobileLeftBtn = document.querySelector(".main_slider_btn_left");
+    const mobileRightBtn = document.querySelector(".main_slider_btn_right");
+
+    if (mobileImages.length <= 1) {
+      if (mobileLeftBtn) mobileLeftBtn.style.display = "none";
+      if (mobileRightBtn) mobileRightBtn.style.display = "none";
+      mobileDotsContainer.style.display = "none";
+    } else {
+      if (mobileLeftBtn) mobileLeftBtn.style.display = "";
+      if (mobileRightBtn) mobileRightBtn.style.display = "";
+      mobileDotsContainer.style.display = "";
+    }
+
+    if (mobileLeftBtn) {
+      mobileLeftBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        currentMobileIndex =
+          currentMobileIndex > 0
+            ? currentMobileIndex - 1
+            : mobileImages.length - 1;
+        updateMainPhoto(mobileImages[currentMobileIndex]);
+        updateMobileDots();
+      });
+    }
+
+    if (mobileRightBtn) {
+      mobileRightBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        currentMobileIndex =
+          currentMobileIndex < mobileImages.length - 1
+            ? currentMobileIndex + 1
+            : 0;
+        updateMainPhoto(mobileImages[currentMobileIndex]);
+        updateMobileDots();
+      });
+    }
+
+    // Добавляем поддержку свайпа
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    mainPhotoContainer.addEventListener("touchstart", (event) => {
+      touchStartX = event.changedTouches[0].screenX;
+    }, { passive: true });
+
+    mainPhotoContainer.addEventListener("touchend", (event) => {
+      touchEndX = event.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+      const swipeDistance = touchEndX - touchStartX;
+      const minSwipeDistance = 50; // Минимальное расстояние для свайпа
+
+      if (swipeDistance > minSwipeDistance) {
+        // Свайп вправо (предыдущее изображение)
+        currentMobileIndex =
+          currentMobileIndex > 0
+            ? currentMobileIndex - 1
+            : mobileImages.length - 1;
+        updateMainPhoto(mobileImages[currentMobileIndex]);
+        updateMobileDots();
+      } else if (swipeDistance < -minSwipeDistance) {
+        // Свайп влево (следующее изображение)
+        currentMobileIndex =
+          currentMobileIndex < mobileImages.length - 1
+            ? currentMobileIndex + 1
+            : 0;
+        updateMainPhoto(mobileImages[currentMobileIndex]);
+        updateMobileDots();
       }
     }
   }
+}
 
   // Изменение цвета иконки STAR
   document.querySelectorAll(".star_icon").forEach(function (star) {
