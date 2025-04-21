@@ -201,16 +201,16 @@ document.addEventListener("DOMContentLoaded", function () {
   const priceButtons = document.querySelectorAll(".price .choose_price");
   priceButtons.forEach((button) => {
     if (button.getAttribute("data-price") === "per_month") {
-      button.classList.add("selected"); // Активна по умолчанию
+      button.classList.add("selected");
     }
   });
 
   // Взаимоисключающий выбор кнопок .choose_price
   document.querySelectorAll(".price .choose_price").forEach((button) => {
     button.addEventListener("click", function (event) {
-      event.preventDefault(); // Предотвращаем действие ссылки, если есть
-      priceButtons.forEach((btn) => btn.classList.remove("selected")); // Снимаем выбор со всех
-      this.classList.add("selected"); // Выбираем только текущую кнопку
+      event.preventDefault();
+      priceButtons.forEach((btn) => btn.classList.remove("selected"));
+      this.classList.add("selected");
     });
   });
 
@@ -315,7 +315,6 @@ document.addEventListener("DOMContentLoaded", function () {
     return result;
   }
 
-  // Исправленная функция updateFilterText
   function updateFilterText(inputId, items, labelText, defaultText) {
     const selectionText =
       items.length > 0 ? formatSelection(items, 10) : defaultText;
@@ -423,6 +422,20 @@ document.addEventListener("DOMContentLoaded", function () {
     const leftBtn = card.querySelector(".card_slider_btn_left");
     const rightBtn = card.querySelector(".card_slider_btn_right");
 
+    // Логирование для отладки
+    console.log("Card images count:", images.length);
+
+    // Инициализация первого изображения
+    if (images.length > 0) {
+      images.forEach((img, index) => {
+        img.classList.toggle("active", index === 0);
+      });
+    } else {
+      console.warn("No images found in card:", card);
+      return; // Прерываем, если нет изображений
+    }
+
+    // Инициализация точек слайдера
     let dotsContainer = container.querySelector(".slider_dots");
     if (!dotsContainer) {
       dotsContainer = document.createElement("div");
@@ -445,12 +458,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let currentIndex = 0;
 
-    if (images.length > 0) {
-      images.forEach((img, index) => {
-        img.classList.toggle("active", index === 0);
-      });
-    }
-
     function updateDots() {
       const dots = dotsContainer.querySelectorAll(".dot");
       dots.forEach((dot, index) => {
@@ -458,21 +465,56 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    leftBtn.addEventListener("click", function (event) {
-      event.stopPropagation();
-      images[currentIndex].classList.remove("active");
-      currentIndex = (currentIndex - 1 + images.length) % images.length;
-      images[currentIndex].classList.add("active");
-      updateDots();
-    });
+    // Управление видимостью стрелок и точек
+    if (window.innerWidth <= 750 && images.length <= 1) {
+      if (leftBtn) {
+        leftBtn.classList.remove("visible");
+        console.log("Hiding left button for card with 1 image");
+      }
+      if (rightBtn) {
+        rightBtn.classList.remove("visible");
+        console.log("Hiding right button for card with 1 image");
+      }
+      if (dotsContainer) {
+        dotsContainer.classList.remove("visible");
+        console.log("Hiding dots for card with 1 image");
+      }
+    } else {
+      if (leftBtn) {
+        leftBtn.classList.add("visible");
+        console.log("Showing left button for card with multiple images");
+      }
+      if (rightBtn) {
+        rightBtn.classList.add("visible");
+        console.log("Showing right button for card with multiple images");
+      }
+      if (dotsContainer) {
+        dotsContainer.classList.add("visible");
+        console.log("Showing dots for card with multiple images");
+      }
+    }
 
-    rightBtn.addEventListener("click", function (event) {
-      event.stopPropagation();
-      images[currentIndex].classList.remove("active");
-      currentIndex = (currentIndex + 1) % images.length;
-      images[currentIndex].classList.add("active");
-      updateDots();
-    });
+    if (leftBtn && images.length > 1) {
+      leftBtn.addEventListener("click", function (event) {
+        event.stopPropagation();
+        event.preventDefault();
+        images[currentIndex].classList.remove("active");
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+        images[currentIndex].classList.add("active");
+        updateDots();
+      });
+    }
+
+    if (rightBtn && images.length > 1) {
+      rightBtn.addEventListener("click", function (event) {
+        event.stopPropagation();
+        event.preventDefault();
+        images[currentIndex].classList.remove("active");
+        currentIndex = (currentIndex + 1) % images.length;
+        images[currentIndex].classList.add("active");
+        updateDots();
+      });
+    }
   });
 
   // Слайдер (галерея на странице описания)
@@ -640,6 +682,8 @@ document.addEventListener("DOMContentLoaded", function () {
         mobileImages = [mainSource ? mainSource.srcset : mainPhotoImg.src];
       }
 
+      console.log("Mobile images count:", mobileImages.length);
+
       let currentMobileIndex = 0;
 
       const mainPhotoSrc =
@@ -705,13 +749,14 @@ document.addEventListener("DOMContentLoaded", function () {
       const mobileRightBtn = document.querySelector(".main_slider_btn_right");
 
       if (mobileImages.length <= 1) {
-        if (mobileLeftBtn) mobileLeftBtn.style.display = "none";
-        if (mobileRightBtn) mobileRightBtn.style.display = "none";
-        mobileDotsContainer.style.display = "none";
+        if (mobileLeftBtn) mobileLeftBtn.classList.remove("visible");
+        if (mobileRightBtn) mobileRightBtn.classList.remove("visible");
+        if (mobileDotsContainer)
+          mobileDotsContainer.classList.remove("visible");
       } else {
-        if (mobileLeftBtn) mobileLeftBtn.style.display = "";
-        if (mobileRightBtn) mobileRightBtn.style.display = "";
-        mobileDotsContainer.style.display = "";
+        if (mobileLeftBtn) mobileLeftBtn.classList.add("visible");
+        if (mobileRightBtn) mobileRightBtn.classList.add("visible");
+        if (mobileDotsContainer) mobileDotsContainer.classList.add("visible");
       }
 
       if (mobileLeftBtn) {
